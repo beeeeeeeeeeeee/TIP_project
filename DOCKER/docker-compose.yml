@@ -1,0 +1,12 @@
+version: "3.0"
+services:
+  django:
+    build: ../APP
+    command: python manage.py runserver
+
+  database:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
