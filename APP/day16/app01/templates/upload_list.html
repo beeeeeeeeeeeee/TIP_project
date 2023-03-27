@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container">
+        {#    "multipart/form-data" support upload file    #}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" name="username">
+            <input type="file" name="avatar">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends "layout.html" %}
+
+{% load static %}
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">Bar Chart</div>
+            <div class="panel-body">
+                <div id="m2" style="width: 100%;height:400px;">
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Pie Chart</div>
+                    <div class="panel-body">
+                        <div id="m1" style="width: 100%;height:400px;">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Bar Chart</div>
+                    <div class="panel-body">
+                        <div id="m3" style="width: 100%;height:400px;">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static "js/echarts.js" %}"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            initBar();
+            initPie();
+            initLine();
+        })
+
+        // reset bar
+        function initBar() {
+            // Initialize the echarts instance based on the prepared dom
+            var myChart = echarts.init(document.getElementById('m1'));
+
+            // Specify the configuration items and data for the chart
+            var option = {
+                title: {
+                    text: 'ECharts Getting Started Example'
+                },
+                tooltip: {},
+                legend: {
+                    data: ['sales'],
+                    right: 0
+                },
+                xAxis: {
+                    data: ['Shirts', 'Cardigans', 'Chiffons', 'Pants', 'Heels', 'Socks']
+                },
+                yAxis: {},
+                series: [
+                    {
+                        name: 'sales',
+                        type: 'bar',
+                        data: [5, 20, 36, 10, 10, 20]
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: "/chart/bar/",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    // get the data from backend
+                    if (res.status) {
+                        option.legend.data = res.data.legend1;
+                        option.xAxis.data = res.data.x_axis;
+                        option.series = res.data.series_list;
+
+                        myChart.setOption(option)
+
+                    }
+                }
+            })
+
+        }
+
+        function initPie() {
+            var myChart = echarts.init(document.getElementById('m3'));
+
+            var option = {
+                title: {
+                    text: 'Referer of a Website',
+                    subtext: 'Fake Data',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    bottom: 0
+                },
+                series: [
+                    {
+                        name: 'Access From',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            {value: 1048, name: 'Search Engine'},
+                            {value: 735, name: 'Direct'},
+                            {value: 580, name: 'Email'},
+                            {value: 484, name: 'Union Ads'},
+                            {value: 300, name: 'Video Ads'}
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+
+            $.ajax({
+                url: "/chart/pie/",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        option.series[0].data = res.data;
+                        myChart.setOption(option)
+
+                    } else {
+
+                    }
+                }
+            })
+
+
+        }
+
+        function initLine() {
+            var myChart = echarts.init(document.getElementById('m2'));
+            var option = {
+                title: {
+                    text: 'Stacked Line'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine'],
+                    bottom: 0
+                },
+
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: 'Email',
+                        type: 'line',
+                        stack: 'Total',
+                        data: [120, 132, 101, 134, 90, 230, 210]
+                    },
+                    {
+                        name: 'Union Ads',
+                        type: 'line',
+                        stack: 'Total',
+                        data: [220, 182, 191, 234, 290, 330, 310]
+                    },
+                    {
+                        name: 'Video Ads',
+                        type: 'line',
+                        stack: 'Total',
+                        data: [150, 232, 201, 154, 190, 330, 410]
+                    },
+                    {
+                        name: 'Direct',
+                        type: 'line',
+                        stack: 'Total',
+                        data: [320, 332, 301, 334, 390, 330, 320]
+                    },
+                    {
+                        name: 'Search Engine',
+                        type: 'line',
+                        stack: 'Total',
+                        data: [820, 932, 901, 934, 1290, 1330, 1320]
+                    }
+                ]
+            };
+            $.ajax({
+                url: "/chart/line/",
+                type: "get",
+                dataType: "JSON",
+                success: function (res) {
+                    if (res.status) {
+                        option.legend.data = res.data.legend;
+                        option.xAxis.data = res.data.x_axis;
+                        option.series = res.data.series_list;
+                        myChart.setOption(option)
+
+                    }
+                }
+
+
+            })
+
+
+        }
+
+    </script>
+
+{% endblock %}
+

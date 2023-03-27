@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px">
+            <a class="btn btn-success" href="/user/add/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                Add New User
+            </a>
+            <a class="btn btn-success" href="/user/model/form/add/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                Add New User ModelForm
+            </a>
+        </div>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                User List
+            </div>
+
+            <!-- Table -->
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Password</th>
+                    <th>Age</th>
+                    <th>Account</th>
+                    <th>Entry Time</th>
+                    <th>Gender</th>
+                    <th>Department Name</th>
+                    <th>Operation</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for obj in queryset %}
+                    <tr>
+                        <td>{{ obj.id }}</td>
+                        <td>{{ obj.name }}</td>
+                        <td>{{ obj.password }}</td>
+                        <td>{{ obj.age }}</td>
+                        <td>{{ obj.account }}</td>
+                        {#                        not work special syntax <td>{{ obj.create_time.strftime("%Y-%m-%d") }}</td>#}
+                        <td>{{ obj.create_time|date:"Y-m-d" }}</td>
+                        <td>{{ obj.get_gender_display }}</td>
+                        <td>{{ obj.depart.title }}</td>
+                        <td>
+                            <a href="/user/{{ obj.id }}/edit/" class="btn btn-primary btn-xs">Edit</a>
+                            <a href="/user/{{ obj.id }}/delete/" class="btn btn-danger btn-xs">Delete</a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+{% endblock %}
+
