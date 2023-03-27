@@ -34,5 +34,5 @@ docker-compose -f ./DOCKER/docker-compose.yml up -d
 ## Running django app
 maybe
 ```bash
-python ./APP/manage.py runserver
+python ./APP/day16/manage.py runserver
 ```
