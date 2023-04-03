@@ -4,3 +4,4 @@ mysqlclient
 pymysql
 Django-import-export
 pillow
+django-environ

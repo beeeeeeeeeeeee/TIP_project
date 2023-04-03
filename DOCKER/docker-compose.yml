@@ -16,6 +16,11 @@ services:
     environment:
       - WAIT_HOSTS=mysql:3306
       - MYSQL_HOST=mysql
+      - ENVIRONMENT=docker
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_PORT=${MYSQL_PORT}
       
   mysql:
     image: mysql

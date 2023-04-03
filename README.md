@@ -27,9 +27,20 @@ This project is part of technology innovation project
 3. python3
 
 ## How to run the stack
+
+### first time setup
+```bash
+docker-compose \
+    -f ./DOCKER/docker-compose.yml  \
+    --env-file .env \
+    up --build
+```
 ### spin up docker containers
 ```bash
-docker-compose -f ./DOCKER/docker-compose.yml up -d
+docker-compose \
+    -f ./DOCKER/docker-compose.yml  \
+    --env-file .env \
+    up
 ```
 ## Running django app
 maybe
