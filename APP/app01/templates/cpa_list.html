@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px" class="clearfix">
+            <a class="btn btn-success" href="/cpa/add/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                Add New CPA Information
+            </a>
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                    Bulk Uploads
+                </div>
+                <div class="panel-body">
+                    <form method="post" enctype="multipart/form-data" action="/cpa/multi/">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="file" name="exc">
+
+                        </div>
+                        <input type="submit" value="Upload" class="btn btn-info btn-xs">
+                    </form>
+                </div>
+
+            </div>
+
+            <div style="float:right; width: 300px">
+                <form method="get">
+                    <div class="input-group">
+
+                        <input type="text" class="form-control" name="q" placeholder="Search for...">
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                    </span>
+                    </div><!-- /input-group -->
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                CPA List
+            </div>
+
+            <!-- Table -->
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>CID</th>
+                    <th>UID</th>
+                    <th>AID</th>
+                    <th>Address</th>
+                    <th>PID</th>
+                    <th>Piano</th>
+                    <th>SN</th>
+                    <th>Sales</th>
+                    <th>Co Sales</th>
+                    <th>Sold Date</th>
+                    <th>Active</th>
+                    <th>Directly Sold</th>
+                    <th>Operation</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for obj in queryset %}
+                    <tr>
+                        <td>{{ obj.cid }}</td>
+                        <td>{{ obj.uid }}</td>
+                        <td>{{ obj.aid_id }}</td>
+                        <td>{{ obj.aid.address }}, {{ obj.aid.postcode }}</td>
+                        <td>{{ obj.pid_id }}</td>
+                        <td>{{ obj.pid.brand }}, {{ obj.pid.model }}</td>
+                        <td>{{ obj.sn }}</td>
+                        <td>{{ obj.sales }}</td>
+                        <td>{{ obj.co_sales }}</td>
+                        <td>{{ obj.sold_date | date:"d b Y" }}</td>
+                        <td>{{ obj.active }}</td>
+                        <td>{{ obj.directly_sold }}</td>
+
+                        <td>
+                            <a href="/cpa/{{ obj.cid }}/edit/" class="btn btn-primary btn-xs">Edit</a>
+                            <a href="#" class="btn btn-danger btn-xs">Delete</a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+
+    </div>
+{% endblock %}
