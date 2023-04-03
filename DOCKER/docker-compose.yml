@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   web: 
+    image: django_tip_project
     build:
       context: ../APP
       dockerfile: Dockerfile
