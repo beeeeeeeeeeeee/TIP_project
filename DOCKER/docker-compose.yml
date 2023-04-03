@@ -1,12 +1,54 @@
-version: "3.0"
+version: "3.9"
 services:
-  django:
-    build: ../APP
-    command: python manage.py runserver
-
-  database:
-    image: postgres
+  web: 
+    build:
+      context: ../APP
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    # volumes:
+    #   - ./APP:/app
+    working_dir: /app
+    ports: 
+      - '8000:8000'
+    depends_on:
+      - mysql
+    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      - WAIT_HOSTS=mysql:3306
+      - MYSQL_HOST=mysql
+      - ENVIRONMENT=docker
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_PORT=${MYSQL_PORT}
+      
+  mysql:
+    image: mysql
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      # Database name
+      MYSQL_DATABASE: ${MYSQL_DB}
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: ${MYSQL_USER}
+      # You can use whatever password you like
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      CHARSET: utf8
+    restart: always
+    ports:
+      - '3306:3306'
+  
+  myphpadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 5050:80
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    restart: always
+
+volumes:
+  mysql-data:
+  .:
