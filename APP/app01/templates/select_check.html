@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px" class="clearfix">
+            <a class="btn btn-success" href="/select/user/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                Add New Consumption
+            </a>
+            <a class="btn btn-success" href="/tuning/{{ cid }}/book/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                Book New Piano Tuning
+            </a>
+
+        </div>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                User List
+            </div>
+
+            <!-- Table -->
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>UID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Gender</th>
+                    <th>Phone Number</th>
+                    <th width=15%>Operation</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for obj in queryset_user %}
+                    <tr uid="{{ obj.uid }}">
+                        <td>{{ obj.uid }}</td>
+                        <td>{{ obj.first_name }} {{ obj.last_name }}</td>
+                        <td>{{ obj.email }}</td>
+                        <td>{{ obj.gender }}</td>
+                        <td>{{ obj.phone_number }}</td>
+
+                        <td>
+                            <a href="/user/{{ obj.uid }}/edit/" class="btn btn-primary btn-xs">Edit</a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                Address List
+            </div>
+
+            <!-- Table -->
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>AID</th>
+                    <th>Address</th>
+                    <th>Suburb</th>
+                    <th>Postcode</th>
+                    <th width=15%>Operation</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for obj in queryset_address %}
+                    <tr uid="{{ obj.aid }}">
+                        <td>{{ obj.aid }}</td>
+                        <td>{{ obj.address }}</td>
+                        <td>{{ obj.suburb }}</td>
+                        <td>{{ obj.postcode }}</td>
+
+                        <td>
+                            <a href="/address/{{ obj.aid }}/edit/" class="btn btn-primary btn-xs">Edit</a>
+
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+        </div>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                Piano List
+            </div>
+
+            <!-- Table -->
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>PID</th>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>Sub Model</th>
+                    <th>Color</th>
+                    <th>Type</th>
+                    <th width=15%>Operation</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for obj in queryset_piano %}
+                    <tr uid="{{ obj.pid }}">
+                        <td>{{ obj.pid }}</td>
+                        <td>{{ obj.brand }}</td>
+                        <td>{{ obj.model }}</td>
+                        <td>{{ obj.sub_model }}</td>
+                        <td>{{ obj.colour }}</td>
+                        <td>{{ obj.type }}</td>
+
+                        <td>
+                            <a href="/piano/{{ obj.pid }}/edit/" class="btn btn-primary btn-xs">Edit</a>
+
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+        </div>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                CPA List
+            </div>
+
+            <!-- Table -->
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>CID</th>
+                    <th>UID</th>
+                    <th>AID</th>
+                    <th>PID</th>
+                    <th>SN</th>
+                    <th>Sales</th>
+                    <th>Co Sales</th>
+                    <th>Sold Date</th>
+                    <th>Active</th>
+                    <th>Directly Sold</th>
+                    <th  width=15%>Operation</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for obj in queryset_cpa %}
+                    <tr uid="{{ obj.cid }}">
+                        <td>{{ obj.cid }}</td>
+                        <td>{{ obj.uid_id }}</td>
+                        <td>{{ obj.aid_id }}</td>
+                        <td>{{ obj.pid_id }}</td>
+                        <td>{{ obj.sn }}</td>
+                        <td>{{ obj.sales }}</td>
+                        <td>{{ obj.co_sales }}</td>
+                        <td>{{ obj.sold_date }}</td>
+                        <td>{{ obj.active }}</td>
+                        <td>{{ obj.directly_sold }}</td>
+
+                        <td>
+                            <a  href="/cpa/{{ obj.cid }}/edit/" class="btn btn-primary btn-xs float-right">Edit</a>
+
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+        </div>
+
+
+    </div>
+{% endblock %}

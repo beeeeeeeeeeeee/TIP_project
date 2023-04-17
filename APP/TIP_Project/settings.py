@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-((_%vncex#ec&8n#hk^me3sjlmi5#^fv=kj6^l#j#71%sb69(i"
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -80,16 +80,22 @@ WSGI_APPLICATION = "TIP_Project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 if env('ENVIRONMENT')=="docker":
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': env('MYSQL_DB'),
-            'USER': env('MYSQL_USER'),
-            'PASSWORD': env('MYSQL_PASSWORD'),
-            'HOST': env('MYSQL_HOST'),
-            'PORT': env('MYSQL_PORT'),
+            'NAME': env('SQL_NAME'),
+            'USER': env('SQL_USER'),
+            'PASSWORD': env('SQL_PASSWORD'),
+            'HOST': env('SQL_HOST'),
+            'PORT': env('SQL_PORT'),
             
         }
     }
@@ -100,9 +106,6 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-
-
-
 
 
 # Password validation
@@ -129,11 +132,20 @@ USE_I18N = True
 
 USE_TZ = True
 
+# FOR MAP VISUALISATION
+GOOGLE_API_KEY =  env('GOOGLE_API_KEY')
+# FOR S3 BUCKET
+ACCESS_KEY = env('ACCESS_KEY')
+ACCESS_SECRET = env('ACCESS_SECRET')
+BUCKET_NAME = env('BUCKET_NAME')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

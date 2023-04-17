@@ -3,6 +3,24 @@ from django.db import models
 
 # Create your models here.
 
+class User(models.Model):
+    uid = models.BigAutoField(verbose_name="User ID", primary_key=True)
+    first_name = models.CharField(verbose_name="First Name", max_length=128)
+    last_name = models.CharField(verbose_name="Last Name", max_length=128)
+    email = models.EmailField(verbose_name="email", max_length=128, null=True, blank=True)
+
+    gender_choices = (
+        ("Male", "Male"),
+        ("Female", "Female"),
+    )
+    gender = models.CharField(verbose_name="Gender", choices=gender_choices, null=True, blank=True, default="Upright",
+                              max_length=8)
+    phone_number = models.CharField(verbose_name="Phone Number", max_length=32, unique=True)
+
+    def __str__(self):
+        return "UID:" + str(self.uid) + ", " + self.first_name + " " + self.last_name + ", " + self.phone_number
+
+
 class Address(models.Model):
     aid = models.BigAutoField(verbose_name="Address ID", primary_key=True)
     address = models.CharField(verbose_name="Address", max_length=256)
@@ -40,7 +58,9 @@ class Piano(models.Model):
 
 class CPA(models.Model):
     cid = models.BigAutoField(verbose_name="CID", primary_key=True)
-    uid = models.BigIntegerField(verbose_name="User ID")
+    # uid = models.ForeignKey(to="User", to_field="uid", verbose_name="User ID")
+    uid = models.ForeignKey(to="User", to_field="uid", null=True, blank=True, on_delete=models.SET_NULL,
+                            verbose_name="User ID")
     # when del id data in Address,Piano, set the value to null
     aid = models.ForeignKey(to="Address", to_field="aid", null=True, blank=True, on_delete=models.SET_NULL,
                             verbose_name="AID")
@@ -57,6 +77,9 @@ class CPA(models.Model):
     )
     active = models.CharField(verbose_name="Active", choices=choices, default="Yes", max_length=8)
     directly_sold = models.CharField(verbose_name="Directly Sold", choices=choices, default="Yes", max_length=8)
+
+    def __str__(self):
+        return '%s %s %s, SN:%s, Sold Date:%s' % (self.uid, self.aid, self.pid, self.sn, self.sold_date)
 
 
 class Tuning(models.Model):
