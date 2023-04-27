@@ -1,11 +1,31 @@
 version: "3.0"
 services:
-  django:
-    build: ../APP
-    command: python manage.py runserver
-
-  database:
-    image: postgres
+  web: 
+    build:
+      context: ../APP
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    # volumes:
+    #   - ./APP:/app
+    working_dir: /app
+    ports: 
+      - '8000:8000'
+    depends_on:
+      - mysql
+    restart: always
+    environment:
+      - WAIT_HOSTS=mysql:3306
+      - MYSQL_HOST=mysql
+      - ENVIRONMENT=docker
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_PORT=${MYSQL_PORT}
+      
+  mysql:
+    image: mysql
+    volumes:
+      - mysql-data:/var/lib/mysql
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
