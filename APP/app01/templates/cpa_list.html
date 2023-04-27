@@ -1,0 +1,186 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px" class="clearfix">
+            <a class="btn btn-success" href="/cpa/add/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                Add New CPA Information
+            </a>
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                    Bulk Uploads
+                </div>
+                <div class="panel-body">
+                    <form method="post" enctype="multipart/form-data" action="/cpa/multi/">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="file" name="exc">
+
+                        </div>
+                        <input type="submit" value="Upload" class="btn btn-info btn-xs">
+                    </form>
+                </div>
+
+            </div>
+
+            <div style="float:right; width: 300px">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+
+                        <input type="text" class="form-control" name="q" placeholder="Search for...">
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                    </span>
+                    </div><!-- /input-group -->
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+
+                CPA List
+            </div>
+
+            <!-- Table -->
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>CID</th>
+                    <th>UID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>AID</th>
+                    <th>Address</th>
+                    <th>PID</th>
+                    <th>Piano</th>
+                    <th>SN</th>
+                    <th>Sales</th>
+                    <th>Co Sales</th>
+                    <th>Sold Date</th>
+                    <th>Active</th>
+                    <th>Directly Sold</th>
+                    <th>Operation</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for obj in queryset %}
+                    <tr>
+                        <td>{{ obj.cid }}</td>
+                        <td>{{ obj.uid.uid }}</td>
+                        <td>{{ obj.uid.first_name }} {{ obj.uid.last_name }}</td>
+                        <td>{{ obj.uid.phone_number }}</td>
+                        <td>{{ obj.aid_id }}</td>
+                        <td>{{ obj.aid.address }}, {{ obj.aid.suburb }}, {{ obj.aid.postcode }}</td>
+                        <td>{{ obj.pid_id }}</td>
+                        <td>{{ obj.pid.brand }}, {{ obj.pid.model }}</td>
+                        <td>{{ obj.sn }}</td>
+                        <td>{{ obj.sales }}</td>
+                        <td>{{ obj.co_sales }}</td>
+                        <td>{{ obj.sold_date | date:"d b Y" }}</td>
+                        <td>{{ obj.active }}</td>
+                        <td>{{ obj.directly_sold }}</td>
+
+                        <td>
+                            <a href="/cpa/{{ obj.cid }}/edit/" class="btn btn-primary btn-xs">Edit</a>
+                            <input uid="{{ obj.cid }}" type="button" class="btn btn-danger btn-xs btn-delete"
+                                   value="Delete">
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+
+                </tbody>
+            </table>
+
+        </div>
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+
+    </div>
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4>Delete Alert!!</h4>
+                <p>Please double check this action!</p>
+                <p style="text-align: right;">
+                    <button id="btnConfirmDelete" type="button" class="btn btn-danger">Confirm</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        // global variable
+        var DELETE_ID;
+
+        $(function () {
+            bindBtnDeleteEvent();
+            bindBtnConfirmDeleteEvent();
+        })
+
+        function bindBtnDeleteEvent() {
+            $(".btn-delete").click(function () {
+                {#alert("click delete!")#}
+                $("#deleteModal").modal("show");
+                // get the global variable, $(this) means what you click
+                DELETE_ID = $(this).attr("uid");
+                // console.log(DELETE_ID);
+            });
+        }
+
+        function bindBtnConfirmDeleteEvent() {
+            $("#btnConfirmDelete").click(function () {
+                // click confirm button, send DELETE_ID to backend
+                $.ajax({
+                    url: "/cpa/delete", // /order/123/delete/
+                    type: "GET",
+                    dataType: "JSON",
+                    data: {
+                        uid: DELETE_ID
+                    },
+                    success: function (res) {
+                        if (res.status) {
+                            // alert("Successful Delete!")
+                            // after delete hide the modal, reload the page
+                            $("#deleteModal").modal("hide");
+
+                            // js way to delete, save the resource
+                            // $("tr[uid='" + DELETE_ID + "']").remove();
+                            // reset DELETE_ID
+                            // DELETE_ID = 0;
+                            location.reload();
+
+                        } else {
+                            // delete fail
+                            alert(res.error);
+                        }
+                    }
+                })
+            })
+        }
+
+    </script>
+
+{% endblock %}
