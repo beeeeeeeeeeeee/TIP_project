@@ -94,7 +94,7 @@ if env('ENVIRONMENT')=="docker":
             'NAME': env('SQL_NAME'),
             'USER': env('SQL_USER'),
             'PASSWORD': env('SQL_PASSWORD'),
-            'HOST': env('SQL_HOST'),
+            'HOST': 'mysql',
             'PORT': env('SQL_PORT'),
             
         }
