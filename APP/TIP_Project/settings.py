@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "app01.apps.App01Config",
+    'suburb_finder.apps.SuburbFinderConfig', 
 ]
 
 MIDDLEWARE = [
@@ -134,6 +135,7 @@ USE_TZ = True
 
 # FOR MAP VISUALISATION
 GOOGLE_API_KEY =  env('GOOGLE_API_KEY')
+
 # FOR S3 BUCKET
 ACCESS_KEY = env('ACCESS_KEY')
 ACCESS_SECRET = env('ACCESS_SECRET')

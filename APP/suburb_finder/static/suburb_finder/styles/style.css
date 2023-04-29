@@ -1,0 +1,116 @@
+/* 
+ * Always set the map height explicitly to define the size of the div element
+ * that contains the map. 
+ */
+ #map {
+  height: 80%;
+}
+
+
+
+/* 
+ * Optional: Makes the sample page fill the window. 
+ */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  margin-left: 0.6em;
+}
+
+ /* Style the form - display items horizontally */
+ .form-inline {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+
+/* Add some margins for each label */
+.form-inline label {
+  margin: 0.9em 1.2em 0.9em 0.9em;
+}
+
+/* Style the input fields */
+.form-inline input {
+  vertical-align: middle;
+  margin: 0.6em 0.9em 0.6em 0;
+  padding: 0.9em;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+/* Style the submit button */
+.form-inline button {
+  padding: 0.9em 1.2em;
+  background-color: dodgerblue;
+  border: 1px solid #ddd;
+  color: white;
+}
+
+.form-inline button:hover {
+  background-color: royalblue;
+}
+
+/* Add responsiveness - display the form controls vertically instead of horizontally on screens that are less than 800px wide */
+@media (max-width: 800px) {
+  .form-inline input {
+    margin: 0.4em 0.9em;
+    padding: 0.2em;
+  }
+
+  .form-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-inline label {
+    margin: 0.4em 0.2em 0.1em 0.6em;
+  }
+
+}
+
+/* Style the form - display items vertically */
+
+.form-vertical {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: left;
+}
+
+/* Add some margins for each label */
+.form-vertical label {
+  margin: 0.9em 1.2em 0.9em 0.9em;
+}
+
+/* Style the input fields */
+
+.form-vertical input {
+  vertical-align: middle;
+  margin: 0.6em 0.9em 0.6em 0;
+  padding: 0.9em;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+/* Style the submit button */
+
+.form-vertical button {
+  padding: 0.9em 1.2em;
+  background-color: dodgerblue;
+  border: 1px solid #ddd;
+  color: white;
+}
+
+.form-vertical button:hover {
+  background-color: royalblue;
+}
+
+
+

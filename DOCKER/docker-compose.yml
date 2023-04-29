@@ -29,7 +29,7 @@ services:
       - SQL_HOST=localhost
       - SQL_PORT=3306
 
-      - GOOGLE_API_KEY=fsdfsd
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
 
       # FOR S3 BUCKET
       - ACCESS_KEY="sdgsdh"
