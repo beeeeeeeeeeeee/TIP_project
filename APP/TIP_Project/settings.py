@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "app01.apps.App01Config",
+    "dataviz.apps.DatavizConfig",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +55,13 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+]
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+
 ]
 
 ROOT_URLCONF = "TIP_Project.urls"
@@ -76,7 +85,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "TIP_Project.wsgi.application"
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 
+STATIC_URL = '/static/'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
