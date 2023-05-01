@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "app01.apps.App01Config",
+    'suburb_finder.apps.SuburbFinderConfig', 
     "dataviz.apps.DatavizConfig",
     "corsheaders",
 ]
@@ -108,7 +109,7 @@ if env('ENVIRONMENT')=="docker":
             'NAME': env('SQL_NAME'),
             'USER': env('SQL_USER'),
             'PASSWORD': env('SQL_PASSWORD'),
-            'HOST': env('SQL_HOST'),
+            'HOST': 'mysql',
             'PORT': env('SQL_PORT'),
             
         }
@@ -148,6 +149,7 @@ USE_TZ = True
 
 # FOR MAP VISUALISATION
 GOOGLE_API_KEY =  env('GOOGLE_API_KEY')
+
 # FOR S3 BUCKET
 ACCESS_KEY = env('ACCESS_KEY')
 ACCESS_SECRET = env('ACCESS_SECRET')

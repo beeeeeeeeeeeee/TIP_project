@@ -1,18 +1,18 @@
 version: "3.9"
+
 services:
+  
   web: 
     build:
       context: ../APP
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
-    # volumes:
-    #   - ./APP:/app
     working_dir: /app
     ports: 
       - '8000:8000'
     depends_on:
       - mysql
-    restart: always
+    restart: no
     environment:
       - WAIT_HOSTS=mysql:3306
       - MYSQL_HOST=mysql
@@ -21,6 +21,26 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_DB=${MYSQL_DB}
       - MYSQL_PORT=${MYSQL_PORT}
+
+      - DJANGO_SECRET_KEY=secretkey
+      - SQL_USER=${MYSQL_USER}
+      - SQL_PASSWORD=password
+      - SQL_NAME=db
+      - SQL_HOST=localhost
+      - SQL_PORT=3306
+
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+
+      # FOR S3 BUCKET
+      - ACCESS_KEY="sdgsdh"
+      - ACCESS_SECRET="dfff"
+      - BUCKET_NAME="yongbin"
+
+    volumes: 
+      - type: bind
+        source: ../APP
+        target: /app
+
       
   mysql:
     image: mysql
@@ -51,4 +71,3 @@ services:
 
 volumes:
   mysql-data:
-  .:
