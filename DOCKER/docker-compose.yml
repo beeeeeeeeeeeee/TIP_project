@@ -29,9 +29,9 @@ services:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
 
       # FOR S3 BUCKET
-      - ACCESS_KEY="sdgsdh"
-      - ACCESS_SECRET="dfff"
-      - BUCKET_NAME="yongbin"
+      - ACCESS_KEY=${ACCESS_KEY}
+      - ACCESS_SECRET=${ACCESS_SECRET}
+      - BUCKET_NAME=${BUCKET_NAME}
 
     volumes: 
       - type: bind
@@ -59,9 +59,9 @@ services:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
 
       # FOR S3 BUCKET
-      - ACCESS_KEY="sdgsdh"
-      - ACCESS_SECRET="dfff"
-      - BUCKET_NAME="yongbin"
+      - ACCESS_KEY=${ACCESS_KEY}
+      - ACCESS_SECRET=${ACCESS_SECRET}
+      - BUCKET_NAME=${BUCKET_NAME}
   
     volumes: 
       - type: bind
