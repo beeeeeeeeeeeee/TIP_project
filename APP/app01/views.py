@@ -656,7 +656,8 @@ def tuning_list(request):
         queryset = models.Tuning.objects.filter(
             Q(mid__icontains=search_value) | Q(cid__aid__address__icontains=search_value) |
             Q(cid__aid__suburb__icontains=search_value) | Q(cid__aid__postcode__icontains=search_value) |
-            Q(cid__pid__brand__icontains=search_value) | Q(cid__pid__model__icontains=search_value)
+            Q(cid__pid__brand__icontains=search_value) | Q(cid__pid__model__icontains=search_value)|
+            Q(cid__uid__first_name__icontains=search_value) | Q(cid__uid__last_name__icontains=search_value)
         ).order_by("-tid")
         # queryset = models.Address.objects.filter(
         #     Q(address__icontains=search_value) & Q(suburb__icontains=search_value)).order_by("-aid")
@@ -664,7 +665,8 @@ def tuning_list(request):
         content = {
             "form": form,
             "queryset": queryset,
-            "search_value": search_value
+            "search_value": search_value,
+            "page_name": "Tuning List"
         }
         return render(request, "tuning_list.html", content)
     queryset = models.Tuning.objects.all().order_by("-tid")
@@ -674,7 +676,8 @@ def tuning_list(request):
     content = {
         "form": form,
         "queryset": page_object.page_queryset,
-        "page_string": page_object.html()
+        "page_string": page_object.html(),
+        "page_name": "Tuning List"
 
     }
     return render(request, "tuning_list.html", content)
@@ -962,29 +965,32 @@ def tuning_check(request):
         email = form.data['email']
         name = form.data['name']
         address = form.data['address']
-        result_query = (
-                Q(uid__phone_number__icontains=phone_number) & Q(uid__email__icontains=email) &
-                Q(uid__first_name__icontains=name) & Q(uid__last_name__icontains=name) &
-                Q(aid__address__icontains=address)
-        )
-        queryset_cpa = models.CPA.objects.filter(result_query).order_by("-sold_date")
+
+        queryset_phone = models.CPA.objects.filter(uid__phone_number__icontains=phone_number)
+        queryset_email = models.CPA.objects.filter(uid__email__icontains=email)
+        queryset_firstname = models.CPA.objects.filter(uid__first_name__icontains=name)
+        queryset_lastname = models.CPA.objects.filter(uid__first_name__icontains=name)
+        queryset_address = models.CPA.objects.filter(aid__address__icontains=address)
+
+        queryset_name = queryset_firstname | queryset_lastname
+        queryset_cpa = queryset_phone & queryset_email & queryset_address & queryset_name
+
         cid = []
         for query in queryset_cpa:
             cid.append(query.cid)
         queryset_tuning = models.Tuning.objects.filter(cid_id__in=cid).order_by("-tuning_date")
-
+        print(queryset_cpa)
         if queryset_cpa:
             for row in queryset_cpa:
                 lat_list.append(row.aid.lat)
                 long_list.append(row.aid.long)
+                print(row)
 
-                str_info = "Name: %s %s,\nAddress: %s, %s, %s,\nPiano: %s, %s" % (row.uid.first_name,
+                str_info = "Name: %s %s,\nAddress: %s, %s, %s" % (row.uid.first_name,
                                                                                   row.uid.last_name,
                                                                                   row.aid.address,
                                                                                   row.aid.suburb,
                                                                                   row.aid.postcode,
-                                                                                  row.pid.brand,
-                                                                                  row.pid.model
                                                                                   )
                 info_list.append(str_info)
 
@@ -1008,7 +1014,7 @@ def tuning_check(request):
 
         context["queryset_cpa"] = queryset_cpa
         context["queryset_tuning"] = queryset_tuning
-        print(context)
+        # print(context)
 
         return render(request, "tuning_check.html", context)
 
@@ -1351,7 +1357,8 @@ def select_user(request):
     context = {
         'queryset_user': [],
         'form_search': form_search,
-        'form_add': form_add
+        'form_add': form_add,
+        "page_name": "Select User"
 
     }
 
@@ -1375,11 +1382,17 @@ def select_user(request):
             phone_number = form.data['phone_number']
             email = form.data['email']
             name = form.data['name']
-            result_query = (
-                    Q(phone_number__icontains=phone_number) & Q(email__icontains=email) &
-                    Q(first_name__icontains=name) & Q(last_name__icontains=name)
-            )
-            queryset_user = models.User.objects.filter(result_query).order_by("-uid")
+            queryset_phone = models.User.objects.filter(phone_number__icontains=phone_number)
+            queryset_email = models.User.objects.filter(email__icontains=email)
+            queryset_firstname = models.User.objects.filter(first_name__icontains=name)
+            queryset_lastname = models.User.objects.filter(last_name__icontains=name)
+            queryset_user = queryset_phone & queryset_email & (queryset_firstname | queryset_lastname)
+
+            # result_query = (
+            #         Q(phone_number__icontains=phone_number) & Q(email__icontains=email) &
+            #         Q(first_name__icontains=name) & Q(last_name__icontains=name)
+            # )
+            # queryset_user = models.User.objects.filter(result_query).order_by("-uid")
             context['queryset_user'] = queryset_user
 
             return render(request, "select_user.html", context)
@@ -1397,7 +1410,9 @@ def select_address(request, nid):
         'queryset': queryset,
         'queryset_user': queryset_user,
         'form_add': form_add,
-        'uid': uid
+        'uid': uid,
+        "page_name": "Select Address"
+
     }
     if request.method == "POST":
         form_add = AddressModelForm(data=request.POST)
@@ -1475,14 +1490,24 @@ def select_piano(request, uid, aid):
     form_search = SelectPianoForm()
     queryset_user = models.User.objects.filter(uid=uid)
     queryset_address = models.Address.objects.filter(aid=aid)
+    queryset_piano = models.CPA.objects.filter(uid_id=uid)
+    piano_id_list = []
+    queryset_piano_list = []
+    for query in queryset_piano:
+        piano_id_list.append(query.pid_id)
+    for i in piano_id_list:
+        queryset_piano_list.append(models.Piano.objects.filter(pid=i).first())
+
+
     context = {
-        'queryset_piano': [],
+        'queryset_piano': queryset_piano_list,
         'queryset_user':queryset_user,
         'queryset_address':queryset_address,
         'form_search': form_search,
         'form_add': form_add,
         "uid": uid,
-        'aid': aid
+        'aid': aid,
+        "page_name": "Select Piano"
 
     }
 
@@ -1599,6 +1624,8 @@ def select_cpa(request, uid, aid, pid):
         "queryset_user":queryset_user,
         "queryset_address": queryset_address,
         "queryset_piano": queryset_piano,
+        "page_name": "Select CPA"
+
     }
 
     if request.method == "POST":
@@ -1645,6 +1672,8 @@ def select_check(request, cid):
         "queryset_piano": queryset_piano,
         "queryset_cpa": queryset_cpa,
         'cid':cid,
+        "page_name": "Select Check"
+
     }
 
     return render(request, "select_check.html", context)
