@@ -1,0 +1,109 @@
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div>
+        Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
+      </div>
+      <div class="dropdown mt-3">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          Dropdown button
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Action</a></li>
+          <li><a class="dropdown-item" href="#">Another action</a></li>
+          <li><a class="dropdown-item" href="#">Something else here</a></li>
+        </ul>
+        <div id="ui_overlay">
+            <div class="accordion" id="accordionExample">
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Map Options
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <form id="map_config">
+                                <div class="mb-3">
+                                    <label class="form-label">Starting Geo Spatial Coordinate</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">lat</span>
+                                        <input id="config_lat" name="config_lat" type="number"  step=any class="form-control" aria-label="latitude">
+                                        <span class="input-group-text">long</span>
+                                        <input id="config_long" name="config_long" type="number" step=any class="form-control" aria-label="longtitude">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="customRange2" class="form-label">Overlay Opacity</label>
+                                    
+                                    <input type="range" id="config_opacity" name="config_opacity" class="form-range" min="0" max="1" step="0.01" id="customRange2">
+
+                                    
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="map_scale" class="form-label">Hex Scale (km) (some are disabled)</label>
+                                    
+                                    <br>
+                                    <div id="map_scale" class="btn-group" role="group"
+                                        aria-label="Basic radio toggle button group">
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio0"
+                                            autocomplete="off" value="0.5" disabled>
+                                        <label class="btn btn-outline-primary" for="btnradio0">0.5</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1"
+                                            autocomplete="off" checked value="1" disabled>
+                                        <label class="btn btn-outline-primary" for="btnradio1">1</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2"
+                                            autocomplete="off"  checked value="2">
+                                        <label class="btn btn-outline-primary" for="btnradio2">2</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3"
+                                            autocomplete="off" value="3" >
+                                        <label class="btn btn-outline-primary" for="btnradio3">3</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio4"
+                                            autocomplete="off" value="5">
+                                        <label class="btn btn-outline-primary" for="btnradio4">5</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio5"
+                                            autocomplete="off" value="10">
+                                        <label class="btn btn-outline-primary" for="btnradio5">10</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Apply</button>
+                                <button type="reset" class="btn btn-secondary">Reset</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Configurations
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
+                            collapse plugin adds the appropriate classes that we use to style each element. These
+                            classes control the overall appearance, as well as the showing and hiding via CSS
+                            transitions. You can modify any of this with custom CSS or overriding our default variables.
+                            It's also worth noting that just about any HTML can go within the
+                            <code>.accordion-body</code>, though the transition does limit overflow.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
