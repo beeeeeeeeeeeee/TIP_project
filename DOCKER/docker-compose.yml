@@ -14,20 +14,15 @@ services:
       - mysql
     restart: no
     environment:
-      - WAIT_HOSTS=mysql:3306
-      - MYSQL_HOST=mysql
       - ENVIRONMENT=docker
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_DB=${MYSQL_DB}
-      - MYSQL_PORT=${MYSQL_PORT}
 
+      - MYSQL_DB_NAME=${MYSQL_DB_NAME}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      
       - DJANGO_SECRET_KEY=secretkey
-      - SQL_USER=${MYSQL_USER}
-      - SQL_PASSWORD=password
-      - SQL_NAME=db
-      - SQL_HOST=localhost
-      - SQL_PORT=3306
 
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
 
@@ -41,7 +36,6 @@ services:
         source: ../APP
         target: /app
 
-      
   mysql:
     image: mysql
     volumes:
