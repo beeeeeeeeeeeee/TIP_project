@@ -3,7 +3,9 @@ version: "3.9"
 services:
   
   web: 
+    image: webapp
     build:
+      
       context: ../APP
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
@@ -12,7 +14,7 @@ services:
       - '8000:8000'
     depends_on:
       - mysql
-    restart: no
+    restart: "unless-stopped"
     environment:
       - WAIT_HOSTS=mysql:3306
       - MYSQL_HOST=mysql
@@ -21,14 +23,8 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_DB=${MYSQL_DB}
       - MYSQL_PORT=${MYSQL_PORT}
-
+  
       - DJANGO_SECRET_KEY=secretkey
-      - SQL_USER=${MYSQL_USER}
-      - SQL_PASSWORD=password
-      - SQL_NAME=db
-      - SQL_HOST=localhost
-      - SQL_PORT=3306
-
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
 
       # FOR S3 BUCKET
@@ -41,7 +37,36 @@ services:
         source: ../APP
         target: /app
 
-      
+  web-migrate: 
+    image: webapp
+    
+    command: python manage.py migrate --noinput
+    working_dir: /app
+    depends_on:
+      - mysql
+    restart: "no"
+    environment:
+      - WAIT_HOSTS=mysql:3306
+      - MYSQL_HOST=mysql
+      - ENVIRONMENT=docker
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_PORT=${MYSQL_PORT}
+  
+      - DJANGO_SECRET_KEY=secretkey
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+
+      # FOR S3 BUCKET
+      - ACCESS_KEY="sdgsdh"
+      - ACCESS_SECRET="dfff"
+      - BUCKET_NAME="yongbin"
+  
+    volumes: 
+      - type: bind
+        source: ../APP
+        target: /app
+    
   mysql:
     image: mysql
     volumes:
@@ -56,7 +81,7 @@ services:
       # Password for root access
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       CHARSET: utf8
-    restart: always
+    restart: "unless-stopped"
     ports:
       - '3306:3306'
   
@@ -67,7 +92,31 @@ services:
     environment:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    restart: always
-
+    restart: "unless-stopped"
+  cache:
+    image: redis:6.2-alpine
+    restart: "unless-stopped"
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning 
+    volumes: 
+      - cache:/data
+  cachingapi:
+    build:
+      context: ../WAREHOUSE/
+      dockerfile: Dockerfile
+    restart: "unless-stopped"
+    ports:
+      - '8080:8000'
+    depends_on:
+      - cache
+    environment:
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+    volumes:
+      - ../tmp_data/DATA:/code/DATA
+      - ../tmp_data/geojson:/code/geojson
 volumes:
   mysql-data:
+  cache:
+    driver: local

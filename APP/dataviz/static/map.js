@@ -72,7 +72,7 @@ class MapViz {
       const size = this.config["btnradio"]
       console.log("fetching",size);
       const result = await $.ajax({
-        url: "http://127.0.0.1:8080/heatmaps?size="+size+"&data=true&map=true",
+        url: "http://localhost:8080/heatmaps?size="+size+"&data=true&map=true",
         crossDomain: true,
         dataType: 'json',
         async: true,
