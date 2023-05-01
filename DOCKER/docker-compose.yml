@@ -14,6 +14,7 @@ services:
       - '8000:8000'
     depends_on:
       - mysql
+      - web-migrate
     restart: "unless-stopped"
     environment:
       - WAIT_HOSTS=mysql:3306
