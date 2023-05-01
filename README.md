@@ -47,3 +47,14 @@ maybe
 ```bash
 python ./APP/manage.py runserver
 ```
+
+## running warehouse server
+
+```bash
+docker-compose -f ./DOCKER/docker-compose.warehouse.yml up --build
+```
+
+1. Go to http://localhost:8080/docs 
+2. trigger aggregate data API with [1,2,3,5,10] to populate cache
+3. go to http://localhost:8000/dataviz
+   1. profit
