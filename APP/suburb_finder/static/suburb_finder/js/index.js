@@ -10,6 +10,7 @@ let vicPostcodes
 console.log(placeid_list)
 
 // load vicPostcodes.json
+// source https://gist.github.com/randomecho/5020859
 fetch("/static/suburb_finder/js/vicPostcode.json")
   .then((response) => response.json())
   .then((data) => {
@@ -153,14 +154,11 @@ function updatePlaceidList(postcode_list) {
       }
     });
   }
-  console.log("placeid_list", placeid_list);
-  
+  console.log("placeid_list_radius", placeid_list);
+
   applyStyleToMultipleSelected(placeid_list);
 
 }
-
-
-
 
 
 // Handle the click event.
@@ -188,6 +186,7 @@ async function handlePlaceClick(event) {
     // Add placeid to list
     placeid_list.push(feature.placeId);
     applyStyleToMultipleSelected(placeid_list);
+    console.log("placeid_list_click", placeid_list);
   
 
     const place = await feature.fetchPlace();
