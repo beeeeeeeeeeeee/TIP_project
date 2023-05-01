@@ -9,10 +9,7 @@
 
     {% load static %}
     <script type="module" src="{% static 'suburb_finder/js/index.js' %}"></script>
-    {% load static %}
-    <script type="module" src="{% static 'suburb_finder/js/address_add.js' %}"></script>
-    
-    {% load static %}
+
     <link rel="stylesheet" type="text/css" href="{% static 'suburb_finder/styles/style.css' %}"/>
 
 
@@ -20,33 +17,37 @@
   </head>
   <body>
 
-    <form action="{% url 'suburb_finder:index' %}" method="post">
-      {% csrf_token %}
-      <fieldset>
+    
+    <form>
+      
           <legend><h1>Suburb Finder</h1></legend>
           {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
           
           <!-- origin address input -->
-          <label for="origin_ad">Origin address</label>
-          <input type="text" name="origin_ad" id="origin_ad" value="">
+          <label for="origin_ad">Origin address </label>
+          <input type="text" name="origin_ad" id="origin_ad">
           <br>
           <br>
           <!-- suburb search input -->
-          <label for="suburb">Suburb</label>
-          <input type="text" name="suburb" id="suburb" value="Enter a suburb">
+          <label for="suburb">Suburb </label>
+          <input type="text" name="suburb" id="suburb">
           <br>
           <br>
           <!-- slider input -->
-          <label for="myRange">Radius (km):</label>
-          <input type="range" name="radius" min="1" max="100" value="10" class="slider" id="myRange">
+          <label for="radius">Radius (km): </label>
+          <input type="range" name="radius" min="1" max="250" value="10" class="slider" id="radius", oninput="updateRadiusValue(this.value)">
+
+          <p id="radius_value"></p>
+
           <br>
-
           
-              
+      <input type="button" id="search" value="Search">
+      <input type="button" id="clear" value="Clear">
 
-      </fieldset>
-      <!-- <input type="submit" value="Search"> -->
     </form>
+     
+
+    
 
 
     <div id="map"></div>
