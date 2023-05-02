@@ -31,34 +31,22 @@ This project is part of technology innovation project
 
 ## How to run the stack
 
-### first time setup
+### running the app server
+1. configure .env file
 ```bash
-docker-compose \
-    -f ./DOCKER/docker-compose.yml  \
-    --env-file .env \
-    up --build
-```
-### spin up docker containers
-```bash
-docker-compose \
-    -f ./DOCKER/docker-compose.yml  \
-    --env-file .env \
-    up
-```
-## Running django app
-maybe
-```bash
-python ./APP/manage.py runserver
+cp ./DOCKER/.env.example ./DOCKER/.env
 ```
 
-## running warehouse server
+2. edit the file
 
+3. build and run the stack
 ```bash
-docker-compose -f ./DOCKER/docker-compose.warehouse.yml up --build
+docker-compose -f ./DOCKER/docker-compose.yml up --build
 ```
 
-1. Go to http://localhost:8080/docs 
-2. trigger aggregate data API with [1,2,3,5,10] to populate cache
-3. go to http://localhost:8000/dataviz
 
-
+#### if in doubt
+run this command to remove the persistent docker container and volumes with new .env settings
+```bash
+docker-compose -f ./DOCKER/docker-compose.yml down -v
+```
