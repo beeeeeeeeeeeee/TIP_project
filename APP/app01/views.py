@@ -657,7 +657,8 @@ def tuning_list(request):
             Q(mid__icontains=search_value) | Q(cid__aid__address__icontains=search_value) |
             Q(cid__aid__suburb__icontains=search_value) | Q(cid__aid__postcode__icontains=search_value) |
             Q(cid__pid__brand__icontains=search_value) | Q(cid__pid__model__icontains=search_value)|
-            Q(cid__uid__first_name__icontains=search_value) | Q(cid__uid__last_name__icontains=search_value)
+            Q(cid__uid__first_name__icontains=search_value) | Q(cid__uid__last_name__icontains=search_value) |
+            Q(cid__uid__email__icontains=search_value) | Q(cid__uid__phone_number__icontains=search_value)
         ).order_by("-tid")
         # queryset = models.Address.objects.filter(
         #     Q(address__icontains=search_value) & Q(suburb__icontains=search_value)).order_by("-aid")
