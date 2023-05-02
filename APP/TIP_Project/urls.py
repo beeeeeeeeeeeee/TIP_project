@@ -20,6 +20,9 @@ from django.urls import path, include
 
 from app01 import views
 from dataviz import views as dataviz_views
+
+from search.views import SearchFilterView, models_api, export_csv, MapView, DashbordView
+
 urlpatterns = [
 
     path("suburb_finder/", include("suburb_finder.urls")),
@@ -72,5 +75,13 @@ urlpatterns = [
     path("select/<int:cid>/check/", views.select_check),
 
     path("dataviz/", dataviz_views.index),
+
+    path('admin/', admin.site.urls),
+    path('', DashbordView, name='dashboard'),
+    path('search/', SearchFilterView, name='search'),
+    path('dashboard/', DashbordView, name='dashboard'),
+    path('map/',MapView, name='map'),
+    path('api/models/', models_api, name='models_api'),
+    path('export-csv/', export_csv, name='export_csv'),
 
 ]

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'suburb_finder.apps.SuburbFinderConfig', 
     "dataviz.apps.DatavizConfig",
     "corsheaders",
+    "search.apps.SearchConfig",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

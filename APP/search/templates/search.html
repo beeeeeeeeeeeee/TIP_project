@@ -1,0 +1,242 @@
+{% extends "search_base.html" %} 
+{% block sidebar %}{% endblock %}
+{% block content %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js">
+    </script>
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet"
+        type="text/css" />
+
+    <main role="main" class="container-fluid">
+    <div class="container-fluid position-static">
+        <h5 class="text p-0">Search</h5>
+        <form method = "GET" action =".">
+            <div class="form-row">
+                <div class="form-group col">
+                    <div class="input-group">
+                        <input class="form-control py-2 border-right-0 border" type="search" id="autocomplete_name" name="customer_name_auto" placeholder="Search customer name here...">
+                        <script>
+                            $(function(){
+                                var availableTags = [
+                                    {% for customer in names %}
+                                        "{{ customer.first_name }} {{ customer.last_name }}",
+                                    {% endfor %}
+                                ];
+                                $("#autocomplete_name").autocomplete({
+                                    source: availableTags,
+                                    select: function(event, ui) {
+                                        // Set the input field's value to the selected option
+                                        $('#autocomplete_name').val(ui.item.value);
+                                        return false;
+                                    }
+                                });
+                            });
+                        </script>
+                        <span class="input-group-append">
+                            <div class="input-group-text bg-transparent">
+                                <i class="fa fa-search"></i>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <div class="input-group">
+                        <input class="form-control py-2 border-right-0 border" type="search" id="autocomplete_address" name="auto_address" placeholder="Search address here...">
+                        <script>
+                            $(function(){
+                                var availableTags = [
+                                    {% for address in addresses %}
+                                        "{{ address.address }} {{ address.suburb }} {{ address.postcode }}",
+                                    {% endfor %}
+                                ];
+                                $("#autocomplete_address").autocomplete({
+                                    source: availableTags,
+                                    select: function(event, ui) {
+                                        // Set the input field's value to the selected option
+                                        $('#autocomplete_address').val(ui.item.value);
+                                        return false;
+                                    }
+                                });
+                            });
+                        </script>
+                        <span class="input-group-append">
+                            <div class="input-group-text bg-transparent">
+                                <i class="fa fa-search"></i>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group col">
+                    <div class="input-group">
+                        <input class="form-control py-2 border-right-0 border" type="search" name="customer_phone" placeholder="Phone"> 
+                        <span class="input-group-append">
+                            <div class="input-group-text bg-transparent">
+                                <i class="fa fa-search"></i>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group col">
+                    <div class="input-group">
+                        <input class="form-control py-2 border-right-0 border" type="search" id="emaillist" name="customer_email" placeholder="Email">
+                        <script>
+                            $(function(){
+                                var availableTags = [
+                                    {% for email in emails %}
+                                        "{{ email }}",
+                                    {% endfor %}
+                                ];
+                                $("#emaillist").autocomplete({
+                                    source: availableTags,
+                                    select: function(event, ui) {
+                                        // Set the input field's value to the selected option
+                                        $('#emaillist').val(ui.item.value);
+                                        return false;
+                                    }
+                                });
+                            });
+                        </script> 
+                        <span class="input-group-append">
+                            <div class="input-group-text bg-transparent">
+                                <i class="fa fa-search"></i>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col">
+                    <div class="input-group">
+                        <input class="form-control py-2 border-right-0 border" type="search" id="auto_product" name="product_brand" placeholder="Search product">
+                        <script>
+                            $(function(){
+                                var availableTags = [
+                                    {% for brand in products %}
+                                        "{{ brand }}",
+                                    {% endfor %}
+                                ];
+                                $("#auto_product").autocomplete({
+                                    source: availableTags,
+                                    select: function(event, ui) {
+                                        // Set the input field's value to the selected option
+                                        $('#auto_product').val(ui.item.value);
+                                        $.ajax({
+                                            url: '/api/models/',
+                                            data: {'brand': ui.item.value},
+                                            success: function(response) {
+                                                var options = "'<option value = '0' selected>Type</option>'";
+                                                console.log(options)
+                                                for (var i = 0; i < response.models.length; i++) {
+                                                var model = response.models[i];
+                                                options += '<option value="' + model.pid + '">' + model.model + '</option>';
+                                                }
+                                                
+                                                    $('#model').html(options);
+                                            }});
+    
+                                       return false;
+                                    }
+                                });
+    
+                            });
+                        </script> 
+                        <span class="input-group-append">
+                            <div class="input-group-text bg-transparent">
+                                <i class="fa fa-search"></i>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group col">
+                    <select id="model" class="form-control" name="product_submodel">
+                        <option value = '0' selected>Model</option>
+                        {% for model in models %}
+                        <option value = {{ model.pid }}> {{ model.model }} </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group col">
+                    <select id="type" class="form-control" name="product_type">
+                        <option value = '0' selected>Type</option>
+                        <option value = 'upright'>upright</option>
+                        <option value = 'grand'>grand</option>
+                    </select>
+                </div>
+                <div class="form-group col">
+                    <!-- <label for="inputtuningdate">Tuning date</label> -->
+                    <input type="number" class="form-control" id="tuningdate" name="tuning_date" placeholder="Last tuning (months)">
+                </div>
+                <div class="form-group col">
+                    <button type="submit" class="btn btn-primary btn-block">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="row position-static">
+        <div class="col-md-10">
+            {% if searched %}
+            <h3>Search result {{ searched }}</h3>
+            {% else %}
+            <h3>Search for...</h3>
+            {% endif %}
+        </div>
+        <div class="col-md-2 col-lg-2">
+            <p><a href="{% url 'export_csv' %}?results=1" class="btn btn-info"><span><i class="fa-solid fa-file-arrow-down"></i></span></a></p>
+        </div>
+    </div>
+    <div class="container-fluid position-static" >
+        <div class="row">
+            <div class="col-md-4 overflow-auto" style="max-height: 500px;">
+                {% for customer in customers %}  
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row card-body">
+                                    <div class ="col">
+                                        <h5 class="card-title">Customer ID: {{ customer.id }}</h5>
+                                        <h6 class="card-subtitle text">Name: {{ customer.first_name }} {{ customer.last_name }}<hr /></h6>
+                                        <p><a href="#" class="btn btn-success btn-block"><span><i class="fa-solid fa-pen-to-square"></i></span></a></p>
+                                        <p><a href="#" class="btn btn-danger btn-block"><span><i class="fa-solid fa-trash"></i></span></a></p>
+                                    </div>
+                                    <div class ="col">
+                                        <p class="card-text p-0 m-0"><b>Email:</b> {{ customer.email }}</p>
+                                        <p class="card-text p-0 m-0"><b>Phone:</b> {{ customer.phone }}</p>
+                                        <p class="card-text p-0 m-0"><b>Address:</b></p>
+                                        <p class="card-text p-0 m-0">{{ customer.address }} {{ customer.suburb }} {{ customer.postcode }}</p>
+                                        <p class="card-text p-0 m-0"><b>Product Brand:</b> {{ customer.brand }}</p>
+                                        <p class="card-text p-0 m-0"><b>Product model:</b> {{ customer.model }}</p>
+                                        <p class="card-text p-0 m-0"><b>Product Type:</b> {{ customer.type }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-8 position-static">
+                <div class="col">
+                    <div class="col position-relative">
+                        {{ map_html|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+
+    </div>
+    
+      
+        
+
+
+    </main>
+
+{% endblock %}
+
+
