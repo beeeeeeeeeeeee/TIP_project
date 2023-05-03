@@ -1,0 +1,129 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: "unless-stopped"
+
+  webserver:
+    image: apache/airflow:latest-python3.10
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=${AIRFLOW__CORE__EXECUTOR}
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
+      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW__CORE__FERNET_KEY}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=${AIRFLOW__CORE__LOAD_EXAMPLES}
+      - AIRFLOW__WEBSERVER__BASE_URL=${AIRFLOW__WEBSERVER__BASE_URL}
+      - AIRFLOW__WEBSERVER__AUTHENTICATE=${AIRFLOW__WEBSERVER__AUTHENTICATE}
+      - AIRFLOW__WEBSERVER__AUTH_BACKEND=${AIRFLOW__WEBSERVER__AUTH_BACKEND}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+
+      - WAREHOUSE_POSTGRES_HOST=warehouse-postgres
+      - WAREHOUSE_POSTGRES_PORT=${WAREHOUSE_POSTGRES_PORT}
+      - WAREHOUSE_POSTGRES_NAME=${WAREHOUSE_POSTGRES_NAME}
+      - WAREHOUSE_POSTGRES_USER=${WAREHOUSE_POSTGRES_USER}
+      - WAREHOUSE_POSTGRES_PASSWORD=${WAREHOUSE_POSTGRES_PASSWORD}
+
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      # - /var/run/docker.sock:/var/run/docker.sock
+
+    ports:
+      - "8080:8080"
+    command: ["airflow", "webserver"]
+    restart: "unless-stopped"
+
+  webserver-setup:
+    image: apache/airflow:latest-python3.10
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=${AIRFLOW__CORE__EXECUTOR}
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
+      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW__CORE__FERNET_KEY}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=${AIRFLOW__CORE__LOAD_EXAMPLES}
+      - AIRFLOW__WEBSERVER__BASE_URL=${AIRFLOW__WEBSERVER__BASE_URL}
+      - AIRFLOW__WEBSERVER__AUTHENTICATE=${AIRFLOW__WEBSERVER__AUTHENTICATE}
+      - AIRFLOW__WEBSERVER__AUTH_BACKEND=${AIRFLOW__WEBSERVER__AUTH_BACKEND}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+    command: >
+      bash -c 'airflow db init &&
+        airflow users create \
+            --username $ADMIN_USERNAME \
+            --password $ADMIN_PASSWORD \
+            --firstname Admin \
+            --lastname User \
+            --role Admin \
+            --email $ADMIN_EMAIL'
+  scheduler:
+    image: apache-scheduler
+    build:
+      context: ./docker/scheduler
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=${AIRFLOW__CORE__EXECUTOR}
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
+      - AIRFLOW__CORE__FERNET_KEY=${AIRFLOW__CORE__FERNET_KEY}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=${AIRFLOW__CORE__LOAD_EXAMPLES}
+      - AIRFLOW__WEBSERVER__BASE_URL=${AIRFLOW__WEBSERVER__BASE_URL}
+      - AIRFLOW__WEBSERVER__AUTHENTICATE=${AIRFLOW__WEBSERVER__AUTHENTICATE}
+      - AIRFLOW__WEBSERVER__AUTH_BACKEND=${AIRFLOW__WEBSERVER__AUTH_BACKEND}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      
+      - WAREHOUSE_POSTGRES_HOST=warehouse-postgres
+      - WAREHOUSE_POSTGRES_PORT=${WAREHOUSE_POSTGRES_PORT}
+      - WAREHOUSE_POSTGRES_NAME=${WAREHOUSE_POSTGRES_NAME}
+      - WAREHOUSE_POSTGRES_USER=${WAREHOUSE_POSTGRES_USER}
+      - WAREHOUSE_POSTGRES_PASSWORD=${WAREHOUSE_POSTGRES_PASSWORD}
+      
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      # - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data
+      - ./scripts:/app/scripts
+
+    command: ["airflow", "scheduler"]
+    restart: "unless-stopped"
+
+  warehouse-postgres:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: ${WAREHOUSE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${WAREHOUSE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${WAREHOUSE_POSTGRES_DB}
+    volumes:
+      - warehouse_postgres_data:/var/lib/postgresql/data
+    restart: "unless-stopped"
+
+  # etl-image-build:
+  #   image: my-etl-image
+  #   build:
+  #     context: ./docker/ETL
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./data:/app/data
+  #     - ./scripts:/app/scripts
+  #   command: "echo 'ETL image built'"
+volumes:
+  postgres_data:
+  warehouse_postgres_data:
+
