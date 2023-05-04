@@ -8,13 +8,16 @@ class MapViz {
       //init stuffs
       this.map = map;
       this.config = JSON.parse(Cookies.get('map_config'))
-      this.colorScaler = d3.scaleSequential().domain([0,1500]).interpolator(d3.interpolateMagma);
+      this.colorScaler = d3.scaleSequential().domain([0,20]).interpolator(d3.interpolateMagma);
       this.geo_data = null;
-      this.agg_data = null;
+      // this.agg_data = null;
       this.get_data().then((result) => {
-        this.geo_data = result["geojson_data"];
-        this.agg_data = result["agg_data"];
+        this.geo_data = result;
+        
+        // this.agg_data = result["agg_data"];
         this.map.data.addGeoJson(this.geo_data);
+        var max_value = d3.max(this.geo_data.features, d => d.properties.value)
+        this.colorScaler = d3.scaleSequential().domain([0,max_value]).interpolator(d3.interpolateMagma);
         this.map.data.setStyle(this.vizStyle);
       })
   
@@ -40,14 +43,15 @@ class MapViz {
       this.config = JSON.parse(Cookies.get('map_config'))
     }
     vizStyle(feature) {
-        var partition = feature.getProperty('partition');
-        var value = this.agg_data["value"][partition]
+        // var partition = feature.getProperty('partition');
+        // var value = this.agg_data["value"][partition]
+        var value = feature.getProperty('value')
         var color = this.colorScaler(value)
         feature.setProperty('color', color);
         var fillOpacity = this.config["config_opacity"]
         var strokeOpacity = this.styleDefault["strokeOpacity"]
         var clickable = true
-        if (value <= 10 || value === undefined) {
+        if (value <= 0 || value === undefined) {
           color = 'none'
           fillOpacity = 0.0
           strokeOpacity = 0
@@ -85,8 +89,8 @@ class MapViz {
         }
       })
       // this.data = result;
-      this.geo_data = result["geojson_data"];
-      this.agg_data = result["agg_data"];
+      this.geo_data = result;
+      // this.agg_data = result["agg_data"];
       return result;
     }
     configPolling() {
@@ -111,10 +115,16 @@ class MapViz {
           if(old_config["btnradio"] != this.config["btnradio"]){
             //fetch new data
             this.get_data().then((result) => {
-              this.geo_data = result["geojson_data"];
-              this.agg_data = result["agg_data"];
+              this.geo_data = result;
+              // this.agg_data = result["agg_data"];
+              map.data.forEach(function(feature) {
+                  map.data.remove(feature);
+              });
+              var max_value = d3.max(this.geo_data.features, d => d.properties.value)
+              this.colorScaler = d3.scaleSequential().domain([0,max_value]).interpolator(d3.interpolateMagma);
               this.map.data.addGeoJson(this.geo_data);
               this.map.data.setStyle(this.vizStyle);
+
             })
   
           }

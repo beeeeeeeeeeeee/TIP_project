@@ -2,6 +2,7 @@ import os
 from airflow import DAG
 from datetime import datetime
 from airflow.operators.python_operator import PythonOperator,BranchPythonOperator
+from airflow.hooks.mysql_hook import MySqlHook
 
 
 import pandas as pd
@@ -15,7 +16,7 @@ from datetime import datetime, timedelta
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2023, 1, 1),
+    'start_date': datetime(2023, 5, 1),
 }
 def load_data(**kwargs):
     for k, v in kwargs.items():
@@ -28,9 +29,13 @@ def load_data(**kwargs):
         input_path =  "/app/data/lake/mockdata/coords.csv"
     if output_path is None:
         output_path = "/app/data/warehouse/"
-
-    coords_df =pd.read_csv(input_path)
     
+    hook = MySqlHook(mysql_conn_id='my_webdb_mysql_conn')
+    connection = hook.get_conn()
+    query = "SELECT * FROM app01_address"
+    coords_df = pd.read_sql(query, connection)
+    connection.close()
+    # coords_df =pd.read_csv(input_path)
     result = coords_df.describe()
     result.to_csv(output_path+"coords_summary.csv")
 
@@ -73,11 +78,11 @@ def transform(**kwargs):
         gdf_geometry["partition"] = gdf_geometry.index
 
 
-        gdf_data = gpd.GeoDataFrame(coords_df, geometry=gpd.points_from_xy(coords_df.lon, coords_df.lat))
+        gdf_data = gpd.GeoDataFrame(coords_df, geometry=gpd.points_from_xy(coords_df.long, coords_df.lat))
 
         gdf_join = gpd.sjoin(gdf_data, gdf_geometry, how="inner", op="within")
-        gdf_agg = gdf_join.groupby("partition").agg({"value": "sum"})
-
+        gdf_agg = gdf_join.groupby("partition").agg({"postcode": "count"})
+        gdf_agg["value"] = gdf_agg["postcode"]
         gdf_geometry.set_index("partition", inplace=True)
         gdf_geometry = gdf_geometry.join(gdf_agg)
         gdf_geometry.fillna(0, inplace=True)
@@ -87,7 +92,7 @@ def transform(**kwargs):
 
 
 
-with DAG('agg_hexmap', default_args=default_args, schedule_interval=timedelta(minutes=15)) as dag:
+with DAG('agg_hexmap', default_args=default_args, schedule_interval=timedelta(hours=24)) as dag:
     
     load_data_task = PythonOperator(
         task_id='run_etl',

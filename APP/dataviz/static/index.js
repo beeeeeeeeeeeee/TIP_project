@@ -13,7 +13,7 @@ function initMapConfig(){
             "config_lat": "-37.8362108",
             "config_long": "144.9948872",
             "config_opacity": "0.5",
-            "btnradio": "1"
+            "btnradio": "3"
         }
         Cookies.set('map_config',JSON.stringify(config))
     }else{
