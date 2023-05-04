@@ -95,23 +95,15 @@ class MapViz {
     }
     configPolling() {
       setInterval(() => {
-        var old_config = this.config;
-        // console.log("old",JSON.stringify(old_config));
-  
+        var old_config = this.config;  
         this.loadConfig();
-        // console.log("new",JSON.stringify(this.config));
-  
-        // console.log("comp",JSON.stringify(old_config) !== JSON.stringify(this.config));
         if (!_.isEqual(old_config,this.config)) {
-  
           this.map.data.setStyle(this.vizStyle);
           
           this.map.setCenter({
             lat: parseFloat(this.config["config_lat"]),
             lng: parseFloat(this.config["config_long"])
-          });
-          console.log("yo setting center");
-  
+          });  
           if(old_config["btnradio"] != this.config["btnradio"]){
             //fetch new data
             this.get_data().then((result) => {
