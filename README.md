@@ -3,25 +3,186 @@ This project is part of technology innovation project
 
 ## project structure
 ```
-├── README.md
+.
+├── AIRFLOW
+│   ├── README.md
+│   ├── dags
+│   ├── docker
+│   ├── docker-compose.yml
+│   ├── logs
+│   ├── plugins
+│   └── scripts
 ├── APP
-│   ├── manage.py
-│   └── ...
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── TIP_Project
+│   ├── app01
+│   ├── dataviz
+│   ├── db.sqlite3
+│   ├── manage.py
+│   ├── requirements.txt
+│   ├── search
+│   └── suburb_finder
 ├── DOCKER
-│   ├── docker-compose.yml
-│   └── ...
-├── JUPYTER
-│   ├── *.ipynb
-│   └── PYTHON_MODULES
-│       ├── __init__.py
-│       └── ...
-├── TEST
-│   ├── test cases
-│   └── ...
+│   ├── docker-compose.yml
+│   └── tmp_data
+├── README.md
 ├── WAREHOUSE
-│   ├── fastapiAPP
-│   └── ...
+│   ├── API
+│   ├── Dockerfile
+│   ├── __pycache__
+│   ├── connections
+│   ├── main.py
+│   └── requirements.txt
+├── src
+│   └── TIPDiagram.drawio.png
+└── tmp_data
+    └── data
 
+22 directories, 13 files
+suchattangjarukij@Suchats-MacBook-Air TIP_project % tree -L 3
+.
+├── AIRFLOW
+│   ├── README.md
+│   ├── dags
+│   │   ├── __pycache__
+│   │   ├── exampledag.py
+│   │   ├── setup
+│   │   ├── summarise_geopy.py
+│   │   └── test_sqlconn.py
+│   ├── docker
+│   │   └── scheduler
+│   ├── docker-compose.yml
+│   ├── logs
+│   │   ├── dag_id=agg_hexmap
+│   │   ├── dag_id=create_warehouse_connection_dag
+│   │   ├── dag_id=example_dag
+│   │   ├── dag_id=setup_connection_setup
+│   │   ├── dag_id=test_sqlconn
+│   │   ├── dag_processor_manager
+│   │   └── scheduler
+│   ├── plugins
+│   └── scripts
+├── APP
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── TIP_Project
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── asgi.py
+│   │   ├── requirements.txt
+│   │   ├── settings.py
+│   │   ├── settings_please_change.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── app01
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── migrations
+│   │   ├── models.py
+│   │   ├── static
+│   │   ├── templates
+│   │   ├── tests.py
+│   │   ├── utilis
+│   │   └── views.py
+│   ├── dataviz
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── migrations
+│   │   ├── models.py
+│   │   ├── static
+│   │   ├── templates
+│   │   ├── tests.py
+│   │   └── views.py
+│   ├── db.sqlite3
+│   ├── manage.py
+│   ├── requirements.txt
+│   ├── search
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── migrations
+│   │   ├── models.py
+│   │   ├── serializers.py
+│   │   ├── templates
+│   │   ├── tests.py
+│   │   └── views.py
+│   └── suburb_finder
+│       ├── __init__.py
+│       ├── __pycache__
+│       ├── admin.py
+│       ├── apps.py
+│       ├── migrations
+│       ├── models.py
+│       ├── static
+│       ├── templates
+│       ├── tests.py
+│       ├── urls.py
+│       └── views.py
+├── DOCKER
+│   ├── docker-compose.yml
+│   └── tmp_data
+├── README.md
+├── WAREHOUSE
+│   ├── API
+│   ├── Dockerfile
+│   ├── __pycache__
+│   │   └── main.cpython-310.pyc
+│   ├── connections
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   └── connections.py
+│   ├── main.py
+│   └── requirements.txt
+├── src
+│   └── TIPDiagram.drawio.png
+└── tmp_data
+    └── data
+        ├── lake
+        └── warehouse
+
+52 directories, 52 files
+suchattangjarukij@Suchats-MacBook-Air TIP_project % tree -L 2
+.
+├── AIRFLOW
+│   ├── README.md
+│   ├── dags
+│   ├── docker
+│   ├── docker-compose.yml
+│   ├── logs
+│   ├── plugins
+│   └── scripts
+├── APP
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── TIP_Project
+│   ├── app01
+│   ├── dataviz
+│   ├── db.sqlite3
+│   ├── manage.py
+│   ├── requirements.txt
+│   ├── search
+│   └── suburb_finder
+├── DOCKER
+│   ├── docker-compose.yml
+│   └── tmp_data
+├── README.md
+├── WAREHOUSE
+│   ├── API
+│   ├── Dockerfile
+│   ├── __pycache__
+│   ├── connections
+│   ├── main.py
+│   └── requirements.txt
+├── src
+│   └── TIPDiagram.drawio.png
+└── tmp_data
+    └── data
 ```
 
 ## Pre-requisites
@@ -50,3 +211,27 @@ run this command to remove the persistent docker container and volumes with new 
 ```bash
 docker-compose -f ./DOCKER/docker-compose.yml down -v
 ```
+
+
+## Container used in this project
+![containers diagram](./src/TIPDiagram.drawio.png)
+
+The [docker-compose file](./DOCKER/docker-compose.yml) that we use defines a multi-container application consisting of several services that work together to provide a web application, a MySQL database, a PHPMyAdmin interface, a Redis cache, a PostgreSQL database, an Apache Airflow web server, and a Warehouse API.
+
+The web service is the main web application service. It uses an image called webapp and builds the application using a Dockerfile located in the ../APP directory. It runs the Django web server on port 8000 and depends on the mysql and web-migrate services.
+
+The web-migrate service is used to perform database migrations. It also uses the webapp image and runs the python manage.py migrate command. It depends on the mysql service.
+
+The mysql service provides the MySQL database for the application. It uses the official MySQL Docker image and sets the database name, user, password, and root password as environment variables. It also maps port 3306 to allow connections from outside the container.
+
+The myphpadmin service provides a web-based interface for managing the MySQL database. It uses the official PHPMyAdmin Docker image and maps port 5050 to allow connections from outside the container. It also sets the hostname and root password as environment variables.
+
+The warehouse-api service builds a Warehouse API image from a Dockerfile located in the ../WAREHOUSE directory. It depends on the cache service and maps port 8080 to allow connections from outside the container. It sets the Redis host and port as environment variables and mounts the ../tmp_data/data directory as a volume.
+
+The postgres service provides the PostgreSQL database for the Apache Airflow web server. It uses the official PostgreSQL Docker image and sets the database name, user, password, and data volume as environment variables. It also maps the data volume to allow data persistence.
+
+The airflow-webserver service provides the Apache Airflow web server. It uses the official Apache Airflow Docker image and depends on the postgres service. It sets several environment variables related to Airflow and the Warehouse API. It also mounts the ../AIRFLOW directory as volumes for DAGs, logs, and plugins.
+
+The cache service provides a Redis cache for the application. It uses the official Redis Docker image and maps port 6379 to allow connections from outside the container. It also sets a command to start the Redis server and mounts a volume to allow data persistence. However, it is currently commented out and not used in the application.
+
+Overall, this docker-compose file defines a complex multi-container application that integrates several services and technologies to provide a complete web application with a database, a cache, and a workflow management system.
