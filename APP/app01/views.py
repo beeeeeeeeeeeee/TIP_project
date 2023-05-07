@@ -656,7 +656,7 @@ def tuning_list(request):
         queryset = models.Tuning.objects.filter(
             Q(mid__icontains=search_value) | Q(cid__aid__address__icontains=search_value) |
             Q(cid__aid__suburb__icontains=search_value) | Q(cid__aid__postcode__icontains=search_value) |
-            Q(cid__pid__brand__icontains=search_value) | Q(cid__pid__model__icontains=search_value)|
+            Q(cid__pid__brand__icontains=search_value) | Q(cid__pid__model__icontains=search_value) |
             Q(cid__uid__first_name__icontains=search_value) | Q(cid__uid__last_name__icontains=search_value) |
             Q(cid__uid__email__icontains=search_value) | Q(cid__uid__phone_number__icontains=search_value)
         ).order_by("-tid")
@@ -988,11 +988,11 @@ def tuning_check(request):
                 print(row)
 
                 str_info = "Name: %s %s,\nAddress: %s, %s, %s" % (row.uid.first_name,
-                                                                                  row.uid.last_name,
-                                                                                  row.aid.address,
-                                                                                  row.aid.suburb,
-                                                                                  row.aid.postcode,
-                                                                                  )
+                                                                  row.uid.last_name,
+                                                                  row.aid.address,
+                                                                  row.aid.suburb,
+                                                                  row.aid.postcode,
+                                                                  )
                 info_list.append(str_info)
 
                 lat_array = np.array(lat_list).astype(float)
@@ -1499,11 +1499,10 @@ def select_piano(request, uid, aid):
     for i in piano_id_list:
         queryset_piano_list.append(models.Piano.objects.filter(pid=i).first())
 
-
     context = {
         'queryset_piano': queryset_piano_list,
-        'queryset_user':queryset_user,
-        'queryset_address':queryset_address,
+        'queryset_user': queryset_user,
+        'queryset_address': queryset_address,
         'form_search': form_search,
         'form_add': form_add,
         "uid": uid,
@@ -1622,7 +1621,7 @@ def select_cpa(request, uid, aid, pid):
         "uid": uid,
         'aid': aid,
         "pid": pid,
-        "queryset_user":queryset_user,
+        "queryset_user": queryset_user,
         "queryset_address": queryset_address,
         "queryset_piano": queryset_piano,
         "page_name": "Select CPA"
@@ -1672,12 +1671,389 @@ def select_check(request, cid):
         "queryset_address": queryset_address,
         "queryset_piano": queryset_piano,
         "queryset_cpa": queryset_cpa,
-        'cid':cid,
+        'cid': cid,
         "page_name": "Select Check"
 
     }
 
     return render(request, "select_check.html", context)
+
+
+def chart_list(request):
+    return render(request, "chart_list.html")
+
+
+def bar_m1():
+    year_query = models.CPA.objects.dates('sold_date', 'year')
+    year_list = []
+    year_data_list = []
+    for i in year_query:
+        year = i.year
+        year_list.append(str(i.year))
+        year_data = []
+        for month in range(1,13):
+            queryset = models.CPA.objects.filter(sold_date__year=year,sold_date__month=month)
+            count = queryset.count()
+            year_data.append(count)
+        year_data_list.append(year_data)
+    data_list = []
+    for idx,year in enumerate(year_list):
+        element = {
+            'name': year,
+            'type': 'bar',
+            'data': year_data_list[idx]
+        }
+        data_list.append(element)
+    legend = year_list
+    month_list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug","Sep","Oct","Nov","Dec"]
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'month_list': month_list,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m2():
+    year_query = models.CPA.objects.dates('sold_date', 'year')
+    legend = []
+    year_list = []
+    year_data_list = []
+    for i in year_query:
+        year_list.append(str(i.year))
+        count = models.CPA.objects.filter(sold_date__year=i.year).count()
+        year_data_list.append(count)
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': year_data_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'year_list': year_list,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m3():
+    month_list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug","Sep","Oct","Nov","Dec"]
+    legend = []
+    month_data_list = []
+    for i in range(1,13):
+        count = models.CPA.objects.filter(sold_date__month=i).count()
+        month_data_list.append(count)
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': month_data_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'month_list': month_list,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m4():
+    queryset_distinct_suburb = models.CPA.objects.values_list('aid__suburb').distinct()
+    suburb_list = []
+    count_list = []
+    for i in queryset_distinct_suburb:
+        suburb = i[0]
+        suburb_list.append(suburb)
+        count = models.CPA.objects.filter(aid__suburb=suburb).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    suburb_array = np.array(suburb_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_suburb_list = suburb_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    x_axis = top10_suburb_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m5():
+    queryset_distinct_suburb = models.CPA.objects.values_list('aid__postcode').distinct()
+    suburb_list = []
+    count_list = []
+    for i in queryset_distinct_suburb:
+        suburb = i[0]
+        suburb_list.append(suburb)
+        count = models.CPA.objects.filter(aid__postcode=suburb).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    suburb_array = np.array(suburb_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_suburb_list = suburb_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    x_axis = top10_suburb_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m6():
+    queryset_distinct_value = models.CPA.objects.values_list('uid').distinct()
+    value_list = []
+    count_list = []
+    for i in queryset_distinct_value:
+        value = i[0]
+        value_list.append(value)
+        count = models.CPA.objects.filter(uid=value).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    value_array = np.array(value_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_value_list = value_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    content_list = []
+    for i in top10_value_list:
+        content = "User ID:" + str(i)
+        content_list.append(content)
+
+
+    x_axis = content_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m7():
+    queryset_distinct_values = models.CPA.objects.values_list('pid__brand').distinct()
+    value_list = []
+    count_list = []
+    for i in queryset_distinct_values:
+        value = i[0]
+        value_list.append(value)
+        count = models.CPA.objects.filter(pid__brand=value).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    value_array = np.array(value_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_value_list = value_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    x_axis = top10_value_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m8():
+    queryset_distinct_values = models.CPA.objects.values_list('pid').distinct()
+    value_list = []
+    count_list = []
+    for i in queryset_distinct_values:
+        value = i[0]
+        value_list.append(value)
+        count = models.CPA.objects.filter(pid=value).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    value_array = np.array(value_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_value_list = value_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    x_axis_list = []
+
+    for idx in top10_value_list:
+        brand = models.Piano.objects.filter(pid=idx).first().brand
+        model = models.Piano.objects.filter(pid=idx).first().model
+        x_axis_list.append(brand+'-'+model)
+
+
+    x_axis = x_axis_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def pie_mul(brand):
+    queryset_distinct_values = models.CPA.objects.filter(pid__brand=brand).values_list('pid').distinct()
+    value_list = []
+    count_list = []
+    for i in queryset_distinct_values:
+        value = i[0]
+        value_list.append(value)
+        count = models.CPA.objects.filter(pid=value).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    value_array = np.array(value_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_value_list = value_array[order_index].tolist()
+    top10_count_list = count_array[order_index].tolist()
+
+    x_axis_list = []
+
+    for idx in top10_value_list:
+        model = models.Piano.objects.filter(pid=idx).first().model
+        x_axis_list.append(model)
+
+
+    x_axis = x_axis_list
+    data_list = []
+    for value,name in zip(top10_count_list,x_axis_list):
+        data_list.append({'value':value,'name':name})
+    print(data_list)
+    legend = []
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+
+def chart_bar(request):
+    bar_m1_ele = bar_m1()
+    bar_m2_ele = bar_m2()
+    bar_m3_ele = bar_m3()
+    bar_m4_ele = bar_m4()
+    bar_m5_ele = bar_m5()
+    bar_m6_ele = bar_m6()
+    bar_m7_ele = bar_m7()
+    bar_m8_ele = bar_m8()
+    pie_m9_ele = pie_mul("Yamaha")
+    pie_m10_ele = pie_mul("Ritmuller")
+    pie_m11_ele = pie_mul("Pearl River")
+    pie_m12_ele = pie_mul("Kayserburg")
+
+    result = {}
+    result['bar_m1'] = bar_m1_ele
+    result['bar_m2'] = bar_m2_ele
+    result['bar_m3'] = bar_m3_ele
+    result['bar_m4'] = bar_m4_ele
+    result['bar_m5'] = bar_m5_ele
+    result['bar_m6'] = bar_m6_ele
+    result['bar_m7'] = bar_m7_ele
+    result['bar_m8'] = bar_m8_ele
+    result['pie_m9'] = pie_m9_ele
+    result['pie_m10'] = pie_m10_ele
+    result['pie_m11'] = pie_m11_ele
+    result['pie_m12'] = pie_m12_ele
+
+
+    return JsonResponse(result)
 
 # postcode_data_path = os.path.join("media", "shape_file", "vic_post.shp")
 # suburb_data_path = os.path.join("media", "shape_file", "vic_suburb.shp")
