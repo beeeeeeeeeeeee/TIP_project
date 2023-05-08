@@ -73,4 +73,8 @@ urlpatterns = [
 
     path("dataviz/", dataviz_views.index),
 
+    # data visualisation - yongbin test
+    path("chart/list/", views.chart_list),
+    path("chart/bar/", views.chart_bar)
+
 ]
