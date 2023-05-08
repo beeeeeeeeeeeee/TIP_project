@@ -125,7 +125,7 @@ def data_excel_file():
                 ws.write(row_num, 4, row.piano_condition)
     media_root = settings.MEDIA_ROOT
     media_path = os.path.join(media_root, "test.xls")
-    print(media_path)
+    # print(media_path)
     wb.save(media_path)
 
 
@@ -202,7 +202,7 @@ def address_add(request):
         postcode = request.POST.get("postcode")
         lat = request.POST.get("lat")
         long = request.POST.get("long")
-        print(address)
+        # print(address)
 
         exists = models.Address.objects.filter(address=address, suburb=suburb, postcode=postcode).exists()
         if exists:
@@ -211,7 +211,7 @@ def address_add(request):
             alert = f"The address is exist, and the Address ID is {address_id}, please double check"
             return render(request, "address_add.html", {"form": form, "alert": alert})
 
-        print(address, suburb, postcode, lat, long)
+        # print(address, suburb, postcode, lat, long)
         form.save()
         # rewrite/create the file test.xls in media folder
         data_excel_file()
@@ -810,7 +810,7 @@ def map_queryset_context(queryset, form, title):
     key = settings.GOOGLE_API_KEY
     lat_list = []
     long_list = []
-    print(queryset)
+    # print(queryset)
 
     if not queryset:
         nw_latitude = -37.8275155
@@ -880,7 +880,7 @@ def map_test(request):
         download_queryset = queryset
         return render(request, "map_test.html", context)
     form = TuneSearchForm()
-    print(request.method)
+    # print(request.method)
 
     queryset = models.Tuning.objects.all().order_by("-tuning_date", "cid__aid__postcode")[:10]
     context = map_queryset_context(queryset, form, title="The 10 latest pianos needed tuning")
@@ -980,12 +980,12 @@ def tuning_check(request):
         for query in queryset_cpa:
             cid.append(query.cid)
         queryset_tuning = models.Tuning.objects.filter(cid_id__in=cid).order_by("-tuning_date")
-        print(queryset_cpa)
+        # print(queryset_cpa)
         if queryset_cpa:
             for row in queryset_cpa:
                 lat_list.append(row.aid.lat)
                 long_list.append(row.aid.long)
-                print(row)
+                # print(row)
 
                 str_info = "Name: %s %s,\nAddress: %s, %s, %s" % (row.uid.first_name,
                                                                   row.uid.last_name,
@@ -1056,7 +1056,7 @@ def tuning_book(request, nid):
         return render(request, "book.html", context)
 
     form = TuneBookForm(data=request.POST)
-    print(form)
+    # print(form)
     if form.is_valid():
         mid = request.POST.get("mid", "")
         cid_object = models.CPA.objects.get(cid=nid)
@@ -1426,7 +1426,7 @@ def select_address(request, nid):
             exists = models.Address.objects.filter(result_query).exists()
             if exists:
                 aid = models.Address.objects.filter(result_query).first().aid
-                print(aid)
+                # print(aid)
             else:
                 form_add.save()
                 aid = models.Address.objects.filter(result_query).first().aid
@@ -1434,7 +1434,7 @@ def select_address(request, nid):
                 data_excel_file()
                 # upload the test.xls file to aws s3 bucket
                 upload_s3()
-                print(aid)
+                # print(aid)
 
             return redirect(f"/select/{uid}/{aid}/piano/")
 
@@ -1484,8 +1484,8 @@ class SelectPianoForm(forms.Form):
 def select_piano(request, uid, aid):
     uid = uid
     aid = aid
-    print(uid)
-    print(aid)
+    # print(uid)
+    # print(aid)
     form_add = PianoModelForm()
 
     form_search = SelectPianoForm()
@@ -2010,7 +2010,7 @@ def pie_mul(brand):
     data_list = []
     for value,name in zip(top10_count_list,x_axis_list):
         data_list.append({'value':value,'name':name})
-    print(data_list)
+    # print(data_list)
     legend = []
 
     result = {
