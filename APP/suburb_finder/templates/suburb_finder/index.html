@@ -24,8 +24,8 @@
           {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
           
           <!-- origin address input -->
-          <label for="origin_ad">Origin address </label>
-          <input type="text" name="origin_ad" id="origin_ad">
+          <label for="origin">Origin address </label>
+          <input type="text" name="origin" id="origin">
           <br>
           <br>
           <!-- suburb search input -->
@@ -63,6 +63,13 @@
       src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&v=beta&region=AU&libraries=places"
       async defer>
     </script>
+
+    <table id="results_table">
+      <tr>
+        <th>Suburb</th>
+        <th>Distance (km)</th>
+      </tr>
+    </table>
 
 
   </body>

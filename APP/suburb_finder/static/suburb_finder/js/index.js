@@ -4,18 +4,19 @@ let infoWindow;
 let results_center;
 let circle;
 let suburbCurrent;
-var placeid_list = new Array();
-let vicPostcodes
+let placeIDs
 
-console.log(placeid_list)
+var selected_placeid = new Array();
+var distance_store = new Array();
 
-// load vicPostcodes.json
+
+// load placeIDs.json
 // source https://gist.github.com/randomecho/5020859
-fetch("/static/suburb_finder/js/vicPostcode.json")
+fetch("/static/suburb_finder/js/placeIDs.json")
   .then((response) => response.json())
   .then((data) => {
-    vicPostcodes = new Array(data);
-    console.log(vicPostcodes[0][0]);
+    placeIDs = new Array(data)[0];
+    console.log("placeIDs_json ",placeIDs[3]);
   });
 
 var lat = -37.840935;
@@ -45,6 +46,17 @@ async function initMap() {
   const autocomplete = new google.maps.places.Autocomplete(suburbInput, options);
   autocomplete.bindTo("bounds", map);
 
+  // Autocomplete for origin input.
+  var originInput = document.getElementById("origin");
+  const options_origin = {
+    componentRestrictions: { country: "au" },
+    fields: ["place_id", "geometry", "name"],
+    strictBounds: false,
+    types: ["address"],
+  };
+  const autocomplete_origin = new google.maps.places.Autocomplete(originInput, options_origin);
+  autocomplete_origin.bindTo("bounds", map);
+
 
   // Add the feature layer.
   //@ts-ignore
@@ -70,23 +82,21 @@ async function initMap() {
     var suburb = suburbInput.value;
     console.log(suburb);
     // Get the place details from suburb.
-    const request = {
-      query: suburb,
-      fields: ["place_id", "geometry", "name"],
-    };
 
-    const service = new google.maps.places.PlacesService(map);
-    service.findPlaceFromQuery(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        console.log(results)
-        suburbCurrent = results[0];
-        // Get the place ID from the results.
-        const placeId = results[0].place_id;
-        
-        // Apply the style to the feature layer.
-        applyStyleToSelected(placeId);     
-      }
-    });
+    var place_add = null;
+    // Get the place detail from placeIDs.json
+    if( placeIDs.some(item => item.name + ' ' + item.state === suburb )){
+      place_add = placeIDs.filter(item => item.name + ' ' + item.state === suburb )[0];
+      selected_placeid.push(place_add);
+      console.log("selected_placeid ", selected_placeid);
+
+      suburbCurrent = place_add;
+    }
+
+   
+    applyStyleToMultipleSelected(selected_placeid);
+    updateResultsTable(selected_placeid);
+
 
   });
 
@@ -100,8 +110,7 @@ async function initMap() {
     if(typeof circle !== "undefined"){
     circle.setMap(null);
     }
-    var results_center = suburbCurrent.geometry.location;
-    console.log(results_center);
+    var results_center = {lat: suburbCurrent.lat, lng: suburbCurrent.lng};
 
     // add new circle
     circle = new google.maps.Circle({
@@ -116,54 +125,34 @@ async function initMap() {
     });
 
     // for each postcode, check if it is within the circle
-    var postcode_list = new Array();
-    for (var i = 0; i < vicPostcodes[0].length; i++) {
-      var postcode = vicPostcodes[0][i];
-      var postcode_center = new google.maps.LatLng(postcode.lat, postcode.lng);
-      if (google.maps.geometry.spherical.computeDistanceBetween(results_center, postcode_center) <= radius_km*1) {
-        postcode_list.push(postcode.suburb);
+    var places_inrange = new Array();
+    for (var i = 0; i < placeIDs.length; i++) {
+      var place = placeIDs[i];
+      var place_location = new google.maps.LatLng(place.lat, place.lng);
+      if (google.maps.geometry.spherical.computeDistanceBetween(results_center, place_location) <= radius_km*1) {
+        places_inrange.push(place);
+        if ( selected_placeid.some(item => item.placeID === place.placeID) ) {
+          // do nothing
+        } else {
+          selected_placeid.push(place);
+        }
       }
     }
 
-    console.log("postcode_list", postcode_list);
+    applyStyleToMultipleSelected(selected_placeid);
 
-    updatePlaceidList(postcode_list);
-
+    // update results_table
+    updateResultsTable(selected_placeid);
 
   });
-}
-
-// update placeid_list
-function updatePlaceidList(postcode_list) {
-  for (var i = 0; i < postcode_list[0].length; i++) {
-
-    suburb = postcode_list[0][i];
-
-    // Get the place details from suburb.
-    const request = {
-      query: suburb,
-      fields: ["place_id"],
-    };
-
-    const service = new google.maps.places.PlacesService(map);
-    service.findPlaceFromQuery(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        // Get the place ID from the results.
-        const placeId = results[0].place_id;
-        placeid_list.push(placeId);
-      }
-    });
-  }
-  console.log("placeid_list_radius", placeid_list);
-
-  applyStyleToMultipleSelected(placeid_list);
-
 }
 
 
 // Handle the click event.
 async function handlePlaceClick(event) {
   let feature = event.features[0];
+  console.log('feature: ', feature);
+  console.log('event: ', event);
   if (!feature.placeId) return;
 
   // clear previous circle
@@ -171,59 +160,31 @@ async function handlePlaceClick(event) {
     circle.setMap(null);  
   }
 
-  // Apply the style to the feature layer.
-  //applyStyleToSelected(feature.placeId);
+  //const place = await feature.fetchPlace();
 
-  // if placeid is already in list, remove it
-  if ( placeid_list.includes(feature.placeId) ) {
-    var index = placeid_list.indexOf(feature.placeId);
-    if (index > -1) {
-      placeid_list.splice(index, 1);
-      applyStyleToMultipleSelected(placeid_list);
-    }
+  var clicked_placeid = feature.placeId;
+
+  // if placeid is already in json, remove it
+  if ( selected_placeid.some(item => item.placeID === clicked_placeid) ) {
+    // remove place from object
+    selected_placeid = selected_placeid.filter(item => item.placeID !== feature.placeId);
+    applyStyleToMultipleSelected(selected_placeid);
+    updateResultsTable(selected_placeid);
     suburbCurrent = null;
   } else {
-    // Add placeid to list
-    placeid_list.push(feature.placeId);
-    applyStyleToMultipleSelected(placeid_list);
-    console.log("placeid_list_click", placeid_list);
-  
+    var place_add = null;
+    // Get the place detail from placeIDs.json
+    if( placeIDs.some(item => item.placeID === clicked_placeid )){
+      place_add = placeIDs.filter(item => item.placeID === clicked_placeid)[0];
+      selected_placeid.push(place_add);
+      console.log("place_add ", place_add);
 
-    const place = await feature.fetchPlace();
-    // Get the place details from suburb.
-    const request = {
-      query: place.displayName,
-      fields: ["geometry", "name"],
-    };
-    
-    const service = new google.maps.places.PlacesService(map);
-    service.findPlaceFromQuery(request, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        console.log(results)
-        suburbCurrent = results[0];
-        // Get the place ID from the results.
-        const placeId = feature.placeId;
-            
-        // Apply the style to the feature layer.
-        //applyStyleToSelected(placeId);
-      }
-    });
-  
+      suburbCurrent = place_add;
+    }
 
-  // Add the info window.
-  
-  // console.log(place);
-  let content =
-    '<span style="font-size:small">Display name: ' +
-    place.displayName +
-    "<br/> Place ID: " +
-    feature.placeId +
-    "<br/> Feature type: " +
-    feature.featureType +
-    "</span>";
-
-  //updateInfoWindow(content, event.latLng);
-  
+   
+    applyStyleToMultipleSelected(selected_placeid);
+    updateResultsTable(selected_placeid);
   }
 
 }
@@ -238,6 +199,7 @@ const styleDefault = {
   fillColor: "white",
   fillOpacity: 0.1, // Polygons must be visible to receive click events.
 };
+
 // Style for the clicked Administrative Area Level 2 polygon.
 //@ts-ignore
 const styleClicked = {
@@ -263,6 +225,13 @@ function applyStyleToSelected(placeid) {
 function applyStyleToMultipleSelected(placeids) {
   // Apply styles to the feature layer.
   featureLayer.style = (options) => {
+
+    for( var i = 0; i < placeids.length; i++){ 
+      if ( placeids[i].placeID === options.feature.placeId) { 
+        return styleClicked;
+      }
+    }
+
     // Style fill and stroke for a polygon.
     if (placeids.includes(options.feature.placeId)) {
       return styleClicked;
@@ -270,10 +239,8 @@ function applyStyleToMultipleSelected(placeids) {
     // Style only the stroke for the entire feature type.
     return styleDefault;
   };
+
 }
-
-
-
 
 // Helper function to create an info window.
 function updateInfoWindow(content, center) {
@@ -293,14 +260,95 @@ function updateRadiusValue(val) {
 
 // clear all selected places
 function clearAll() {
-  placeid_list = Array();
-  console.log(placeid_list);
-  applyStyleToMultipleSelected(placeid_list);
+  selected_placeid = Array();
+  console.log(selected_placeid);
+  applyStyleToMultipleSelected(selected_placeid);
   suburbCurrent = null;
   if(typeof circle !== "undefined"){
     circle.setMap(null);  
   }
+  updateResultsTable(selected_placeid);
 }
+
+function updateResultsTable(selected_placeid) {
+  var table = document.getElementById("results_table");
+  table.innerHTML = "";
+
+  var originInput = document.getElementById("origin");
+  if (originInput.value) {   
+    calculateDistance(originInput.value, selected_placeid);
+  }
+
+  for (var i = 0; i < selected_placeid.length; i++) {
+    var place = selected_placeid[i];
+    var row = table.insertRow(i);
+    var cell1 = row.insertCell(0);
+    cell1.innerHTML = place.name;
+    var cell2 = row.insertCell(1);
+    cell2.innerHTML = place.placeID;
+    var cell3 = row.insertCell(2);
+    cell3.innerHTML = place.distance;
+    var cell4 = row.insertCell(3);
+    cell4.innerHTML = place.duration;
+  }
+  var row = table.insertRow(0);
+  var cell1 = row.insertCell(0);
+  cell1.innerHTML = "Name";
+  var cell2 = row.insertCell(1);
+  cell2.innerHTML = "Place ID";
+  var cell3 = row.insertCell(2);
+  cell3.innerHTML = "Distance (km)";
+  var cell4 = row.insertCell(3);
+  cell4.innerHTML = "Travel Time (min)";
+}
+
+async function calculateDistance(origin, selected_placeid) {
+  // Array of selected_placeid.name
+  console.log("placeids: ", selected_placeid);
+  var destination = [];
+  for (var i = 0; i < selected_placeid.length; i++) {
+    destination.push(selected_placeid[i].name + ", " + selected_placeid[i].state);
+  }
+  console.log("destination", destination);
+
+  var service = new google.maps.DistanceMatrixService();
+  service.getDistanceMatrix(
+    {
+      origins: [origin],
+      destinations: destination,
+      travelMode: "DRIVING",
+      unitSystem: google.maps.UnitSystem.METRIC,
+    }, 
+    (response, status) => {
+      if (status !== "OK") {
+        alert("Error was: " + status);
+      } else {
+        distance_store = Array();
+        var origins = response.originAddresses;
+        var destinations = response.destinationAddresses;
+
+        for (var i = 0; i < origins.length; i++) {
+          var results = response.rows[i].elements;
+          for (var j = 0; j < results.length; j++) {
+            var element = results[j];
+            console.log("element", element);
+            console.log("element.distance", element.distance);
+            var distance = element.distance.text;
+            var duration = element.duration.text;
+            var from = origins[i];
+            var to = destinations[j];
+            
+            selected_placeid[j].distance = distance;
+            selected_placeid[j].duration = duration;
+          }
+        }
+        console.log("selected_placeid", selected_placeid);
+      }
+    }
+  );
+}
+
+
 
 // init onload functions
 function init() {
