@@ -41,7 +41,7 @@ async function initMap() {
     componentRestrictions: { country: "au" },
     fields: ["place_id", "geometry", "name"],
     strictBounds: false,
-    types: ["(regions)"],
+    types: ["locality", "postal_code"],
   };
   const autocomplete = new google.maps.places.Autocomplete(suburbInput, options);
   autocomplete.bindTo("bounds", map);
@@ -145,6 +145,14 @@ async function initMap() {
     updateResultsTable(selected_placeid);
 
   });
+
+  // event listener for clear button
+const clearButton = document.getElementById("clear_button");
+clearButton.addEventListener("click", () => {
+  console.log("clear button clicked");
+  clearAll();
+});
+
 }
 
 
@@ -285,35 +293,36 @@ function buildResultsTable(selected_placeid) {
 
   // clear table
   var table = document.getElementById("results_table");
+  table.innerHTML = ``; 
 
   if(selected_placeid){
     // order by travel time
     selected_placeid.sort(function(a, b) {
-      return parseFloat(a.travelTime) - parseFloat(b.travelTime);
+      return parseFloat(a.travelTimeValue) - parseFloat(b.travelTimeValue);
     });
 
     for (var i = 0; i < selected_placeid.length; i++) {
       var place = selected_placeid[i];
       var row = table.insertRow(i);
+      
       var cell1 = row.insertCell(0);
       cell1.innerHTML = place.name;
+      
       var cell2 = row.insertCell(1);
-      cell2.innerHTML = place.placeID;
+      const num_pc = place.postcode.length;
+      if(num_pc > 1){
+        min = Math.min(place.postcode.length, 4);
+        cell2.innerHTML = `${place.postcode.slice(0, min).join(", ")}...`;
+      } else {
+        cell2.innerHTML = place.postcode[0];
+      }
       var cell3 = row.insertCell(2);
       cell3.innerHTML = place.distance;
+      
       var cell4 = row.insertCell(3);
       cell4.innerHTML = place.travelTime;
     }
   }
-  var row = table.insertRow(0);
-  var cell1 = row.insertCell(0);
-  cell1.innerHTML = "Name";
-  var cell2 = row.insertCell(1);
-  cell2.innerHTML = "Place ID";
-  var cell3 = row.insertCell(2);
-  cell3.innerHTML = "Distance (km)";
-  var cell4 = row.insertCell(3);
-  cell4.innerHTML = "Travel Time (min)";
   
 }
 
@@ -349,14 +358,14 @@ function calculateDistance(origin, selected_placeid) {
             console.log("element.distance", element.distance);
             var distance = element.distance.text;
             var duration = element.duration.text;
+            var duration_value = element.duration.value;
             var from = origins[i];
             var to = destinations[j];
             
             selected_placeid[j].distance = distance;
             selected_placeid[j].travelTime = duration;
+            selected_placeid[j].travelTimeValue = duration_value;
 
-            var table = document.getElementById("results_table");
-            table.innerHTML = "";
             buildResultsTable(selected_placeid);
           }
         }
@@ -371,15 +380,6 @@ function calculateDistance(origin, selected_placeid) {
 function init() {
 
 }
-
-var val = document.getElementById("radius").value;
-updateRadiusValue(val);
-
-// event listener for clear button
-const clearButton = document.getElementById("clear");
-clearButton.addEventListener("click", () => {
-  clearAll();
-});
 
 window.onload = init;
 

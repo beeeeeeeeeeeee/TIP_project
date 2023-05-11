@@ -4,8 +4,7 @@ mysqlclient
 pymysql
 Django-import-export
 django-environ
-
-
+django-cors-headers
 boto3==1.26.111
 botocore==1.29.111
 geopy==2.3.0
@@ -13,3 +12,8 @@ googlemaps==4.10.0
 openpyxl==3.1.2
 Pillow==9.5.0
 xlwt==1.3.0
+
+
+cryptography
+djangorestframework
+folium

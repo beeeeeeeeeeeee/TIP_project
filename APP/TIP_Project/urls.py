@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from app01 import views
+from suburb_finder.views import DashbordView
 
 
 urlpatterns = [
@@ -71,5 +72,7 @@ urlpatterns = [
     path("select/<int:uid>/<int:aid>/piano/", views.select_piano),
     path("select/<int:uid>/<int:aid>/<int:pid>/cpa/", views.select_cpa),
     path("select/<int:cid>/check/", views.select_check),
+    
+    path('', DashbordView, name='dashboard'),
 
 ]
