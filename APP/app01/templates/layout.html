@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{{ page_name }}</title>
     <link rel="stylesheet" href="{% static "plugins/bootstrap-3.4.1/css/bootstrap.min.css" %}">
     <style>
         .navbar {
@@ -35,7 +35,7 @@
             <ul class="nav navbar-nav">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">Address Autofill Test <span class="caret"></span></a>
+                       aria-expanded="false">Data Management Admin Only <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/address/list/">Address List</a></li>
                         <li><a href="/piano/list/">Piano List</a></li>
@@ -46,16 +46,23 @@
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">Map Visualisation Test <span class="caret"></span></a>
+                       aria-expanded="false">Piano Tuning Booking <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/map/test/">Test</a></li>
-                        <li><a href="/tuning/check/">Piano Tuning Booking</a></li>
-                        <li><a href="/cpa/new/">Staff Input CPA</a></li>
-                        <li><a href="/select/user/">Staff Input Test 1</a></li>
-
-
+                        <li><a href="/tuning/check/">Existing Piano Tuning Booking</a></li>
+                        <li><a href="/select/user/">New Piano Tuning Booking</a></li>
                     </ul>
                 </li>
+
+                <li><a href="/chart/list/">Data Analytics</a></li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Test - Fan <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/map/test/">Test</a></li>
+                        <li><a href="/cpa/new/">Staff Input CPA</a></li>
+                    </ul>
+                </li>                
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">

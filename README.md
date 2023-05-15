@@ -50,3 +50,7 @@ run this command to remove the persistent docker container and volumes with new 
 ```bash
 docker-compose -f ./DOCKER/docker-compose.yml down -v
 ```
+
+1. Go to http://localhost:8080/docs 
+2. trigger aggregate data API with [1,2,3,5,10] to populate cache
+3. go to http://localhost:8000/dataviz

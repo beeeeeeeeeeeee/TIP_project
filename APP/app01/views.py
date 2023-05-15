@@ -125,7 +125,7 @@ def data_excel_file():
                 ws.write(row_num, 4, row.piano_condition)
     media_root = settings.MEDIA_ROOT
     media_path = os.path.join(media_root, "test.xls")
-    print(media_path)
+    # print(media_path)
     wb.save(media_path)
 
 
@@ -202,7 +202,7 @@ def address_add(request):
         postcode = request.POST.get("postcode")
         lat = request.POST.get("lat")
         long = request.POST.get("long")
-        print(address)
+        # print(address)
 
         exists = models.Address.objects.filter(address=address, suburb=suburb, postcode=postcode).exists()
         if exists:
@@ -211,7 +211,7 @@ def address_add(request):
             alert = f"The address is exist, and the Address ID is {address_id}, please double check"
             return render(request, "address_add.html", {"form": form, "alert": alert})
 
-        print(address, suburb, postcode, lat, long)
+        # print(address, suburb, postcode, lat, long)
         form.save()
         # rewrite/create the file test.xls in media folder
         data_excel_file()
@@ -656,7 +656,9 @@ def tuning_list(request):
         queryset = models.Tuning.objects.filter(
             Q(mid__icontains=search_value) | Q(cid__aid__address__icontains=search_value) |
             Q(cid__aid__suburb__icontains=search_value) | Q(cid__aid__postcode__icontains=search_value) |
-            Q(cid__pid__brand__icontains=search_value) | Q(cid__pid__model__icontains=search_value)
+            Q(cid__pid__brand__icontains=search_value) | Q(cid__pid__model__icontains=search_value) |
+            Q(cid__uid__first_name__icontains=search_value) | Q(cid__uid__last_name__icontains=search_value) |
+            Q(cid__uid__email__icontains=search_value) | Q(cid__uid__phone_number__icontains=search_value)
         ).order_by("-tid")
         # queryset = models.Address.objects.filter(
         #     Q(address__icontains=search_value) & Q(suburb__icontains=search_value)).order_by("-aid")
@@ -664,7 +666,8 @@ def tuning_list(request):
         content = {
             "form": form,
             "queryset": queryset,
-            "search_value": search_value
+            "search_value": search_value,
+            "page_name": "Tuning List"
         }
         return render(request, "tuning_list.html", content)
     queryset = models.Tuning.objects.all().order_by("-tid")
@@ -674,7 +677,8 @@ def tuning_list(request):
     content = {
         "form": form,
         "queryset": page_object.page_queryset,
-        "page_string": page_object.html()
+        "page_string": page_object.html(),
+        "page_name": "Tuning List"
 
     }
     return render(request, "tuning_list.html", content)
@@ -806,7 +810,7 @@ def map_queryset_context(queryset, form, title):
     key = settings.GOOGLE_API_KEY
     lat_list = []
     long_list = []
-    print(queryset)
+    # print(queryset)
 
     if not queryset:
         nw_latitude = -37.8275155
@@ -876,7 +880,7 @@ def map_test(request):
         download_queryset = queryset
         return render(request, "map_test.html", context)
     form = TuneSearchForm()
-    print(request.method)
+    # print(request.method)
 
     queryset = models.Tuning.objects.all().order_by("-tuning_date", "cid__aid__postcode")[:10]
     context = map_queryset_context(queryset, form, title="The 10 latest pianos needed tuning")
@@ -962,30 +966,33 @@ def tuning_check(request):
         email = form.data['email']
         name = form.data['name']
         address = form.data['address']
-        result_query = (
-                Q(uid__phone_number__icontains=phone_number) & Q(uid__email__icontains=email) &
-                Q(uid__first_name__icontains=name) & Q(uid__last_name__icontains=name) &
-                Q(aid__address__icontains=address)
-        )
-        queryset_cpa = models.CPA.objects.filter(result_query).order_by("-sold_date")
+
+        queryset_phone = models.CPA.objects.filter(uid__phone_number__icontains=phone_number)
+        queryset_email = models.CPA.objects.filter(uid__email__icontains=email)
+        queryset_firstname = models.CPA.objects.filter(uid__first_name__icontains=name)
+        queryset_lastname = models.CPA.objects.filter(uid__first_name__icontains=name)
+        queryset_address = models.CPA.objects.filter(aid__address__icontains=address)
+
+        queryset_name = queryset_firstname | queryset_lastname
+        queryset_cpa = queryset_phone & queryset_email & queryset_address & queryset_name
+
         cid = []
         for query in queryset_cpa:
             cid.append(query.cid)
         queryset_tuning = models.Tuning.objects.filter(cid_id__in=cid).order_by("-tuning_date")
-
+        # print(queryset_cpa)
         if queryset_cpa:
             for row in queryset_cpa:
                 lat_list.append(row.aid.lat)
                 long_list.append(row.aid.long)
+                # print(row)
 
-                str_info = "Name: %s %s,\nAddress: %s, %s, %s,\nPiano: %s, %s" % (row.uid.first_name,
-                                                                                  row.uid.last_name,
-                                                                                  row.aid.address,
-                                                                                  row.aid.suburb,
-                                                                                  row.aid.postcode,
-                                                                                  row.pid.brand,
-                                                                                  row.pid.model
-                                                                                  )
+                str_info = "Name: %s %s,\nAddress: %s, %s, %s" % (row.uid.first_name,
+                                                                  row.uid.last_name,
+                                                                  row.aid.address,
+                                                                  row.aid.suburb,
+                                                                  row.aid.postcode,
+                                                                  )
                 info_list.append(str_info)
 
                 lat_array = np.array(lat_list).astype(float)
@@ -1008,7 +1015,7 @@ def tuning_check(request):
 
         context["queryset_cpa"] = queryset_cpa
         context["queryset_tuning"] = queryset_tuning
-        print(context)
+        # print(context)
 
         return render(request, "tuning_check.html", context)
 
@@ -1049,7 +1056,7 @@ def tuning_book(request, nid):
         return render(request, "book.html", context)
 
     form = TuneBookForm(data=request.POST)
-    print(form)
+    # print(form)
     if form.is_valid():
         mid = request.POST.get("mid", "")
         cid_object = models.CPA.objects.get(cid=nid)
@@ -1351,7 +1358,8 @@ def select_user(request):
     context = {
         'queryset_user': [],
         'form_search': form_search,
-        'form_add': form_add
+        'form_add': form_add,
+        "page_name": "Select User"
 
     }
 
@@ -1375,11 +1383,17 @@ def select_user(request):
             phone_number = form.data['phone_number']
             email = form.data['email']
             name = form.data['name']
-            result_query = (
-                    Q(phone_number__icontains=phone_number) & Q(email__icontains=email) &
-                    Q(first_name__icontains=name) & Q(last_name__icontains=name)
-            )
-            queryset_user = models.User.objects.filter(result_query).order_by("-uid")
+            queryset_phone = models.User.objects.filter(phone_number__icontains=phone_number)
+            queryset_email = models.User.objects.filter(email__icontains=email)
+            queryset_firstname = models.User.objects.filter(first_name__icontains=name)
+            queryset_lastname = models.User.objects.filter(last_name__icontains=name)
+            queryset_user = queryset_phone & queryset_email & (queryset_firstname | queryset_lastname)
+
+            # result_query = (
+            #         Q(phone_number__icontains=phone_number) & Q(email__icontains=email) &
+            #         Q(first_name__icontains=name) & Q(last_name__icontains=name)
+            # )
+            # queryset_user = models.User.objects.filter(result_query).order_by("-uid")
             context['queryset_user'] = queryset_user
 
             return render(request, "select_user.html", context)
@@ -1397,7 +1411,9 @@ def select_address(request, nid):
         'queryset': queryset,
         'queryset_user': queryset_user,
         'form_add': form_add,
-        'uid': uid
+        'uid': uid,
+        "page_name": "Select Address"
+
     }
     if request.method == "POST":
         form_add = AddressModelForm(data=request.POST)
@@ -1410,7 +1426,7 @@ def select_address(request, nid):
             exists = models.Address.objects.filter(result_query).exists()
             if exists:
                 aid = models.Address.objects.filter(result_query).first().aid
-                print(aid)
+                # print(aid)
             else:
                 form_add.save()
                 aid = models.Address.objects.filter(result_query).first().aid
@@ -1418,7 +1434,7 @@ def select_address(request, nid):
                 data_excel_file()
                 # upload the test.xls file to aws s3 bucket
                 upload_s3()
-                print(aid)
+                # print(aid)
 
             return redirect(f"/select/{uid}/{aid}/piano/")
 
@@ -1468,21 +1484,30 @@ class SelectPianoForm(forms.Form):
 def select_piano(request, uid, aid):
     uid = uid
     aid = aid
-    print(uid)
-    print(aid)
+    # print(uid)
+    # print(aid)
     form_add = PianoModelForm()
 
     form_search = SelectPianoForm()
     queryset_user = models.User.objects.filter(uid=uid)
     queryset_address = models.Address.objects.filter(aid=aid)
+    queryset_piano = models.CPA.objects.filter(uid_id=uid)
+    piano_id_list = []
+    queryset_piano_list = []
+    for query in queryset_piano:
+        piano_id_list.append(query.pid_id)
+    for i in piano_id_list:
+        queryset_piano_list.append(models.Piano.objects.filter(pid=i).first())
+
     context = {
-        'queryset_piano': [],
-        'queryset_user':queryset_user,
-        'queryset_address':queryset_address,
+        'queryset_piano': queryset_piano_list,
+        'queryset_user': queryset_user,
+        'queryset_address': queryset_address,
         'form_search': form_search,
         'form_add': form_add,
         "uid": uid,
-        'aid': aid
+        'aid': aid,
+        "page_name": "Select Piano"
 
     }
 
@@ -1596,9 +1621,11 @@ def select_cpa(request, uid, aid, pid):
         "uid": uid,
         'aid': aid,
         "pid": pid,
-        "queryset_user":queryset_user,
+        "queryset_user": queryset_user,
         "queryset_address": queryset_address,
         "queryset_piano": queryset_piano,
+        "page_name": "Select CPA"
+
     }
 
     if request.method == "POST":
@@ -1644,10 +1671,389 @@ def select_check(request, cid):
         "queryset_address": queryset_address,
         "queryset_piano": queryset_piano,
         "queryset_cpa": queryset_cpa,
-        'cid':cid,
+        'cid': cid,
+        "page_name": "Select Check"
+
     }
 
     return render(request, "select_check.html", context)
+
+
+def chart_list(request):
+    return render(request, "chart_list.html")
+
+
+def bar_m1():
+    year_query = models.CPA.objects.dates('sold_date', 'year')
+    year_list = []
+    year_data_list = []
+    for i in year_query:
+        year = i.year
+        year_list.append(str(i.year))
+        year_data = []
+        for month in range(1,13):
+            queryset = models.CPA.objects.filter(sold_date__year=year,sold_date__month=month)
+            count = queryset.count()
+            year_data.append(count)
+        year_data_list.append(year_data)
+    data_list = []
+    for idx,year in enumerate(year_list):
+        element = {
+            'name': year,
+            'type': 'bar',
+            'data': year_data_list[idx]
+        }
+        data_list.append(element)
+    legend = year_list
+    month_list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug","Sep","Oct","Nov","Dec"]
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'month_list': month_list,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m2():
+    year_query = models.CPA.objects.dates('sold_date', 'year')
+    legend = []
+    year_list = []
+    year_data_list = []
+    for i in year_query:
+        year_list.append(str(i.year))
+        count = models.CPA.objects.filter(sold_date__year=i.year).count()
+        year_data_list.append(count)
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': year_data_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'year_list': year_list,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m3():
+    month_list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug","Sep","Oct","Nov","Dec"]
+    legend = []
+    month_data_list = []
+    for i in range(1,13):
+        count = models.CPA.objects.filter(sold_date__month=i).count()
+        month_data_list.append(count)
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': month_data_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'month_list': month_list,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m4():
+    queryset_distinct_suburb = models.CPA.objects.values_list('aid__suburb').distinct()
+    suburb_list = []
+    count_list = []
+    for i in queryset_distinct_suburb:
+        suburb = i[0]
+        suburb_list.append(suburb)
+        count = models.CPA.objects.filter(aid__suburb=suburb).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    suburb_array = np.array(suburb_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_suburb_list = suburb_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    x_axis = top10_suburb_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m5():
+    queryset_distinct_suburb = models.CPA.objects.values_list('aid__postcode').distinct()
+    suburb_list = []
+    count_list = []
+    for i in queryset_distinct_suburb:
+        suburb = i[0]
+        suburb_list.append(suburb)
+        count = models.CPA.objects.filter(aid__postcode=suburb).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    suburb_array = np.array(suburb_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_suburb_list = suburb_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    x_axis = top10_suburb_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m6():
+    queryset_distinct_value = models.CPA.objects.values_list('uid').distinct()
+    value_list = []
+    count_list = []
+    for i in queryset_distinct_value:
+        value = i[0]
+        value_list.append(value)
+        count = models.CPA.objects.filter(uid=value).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    value_array = np.array(value_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_value_list = value_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    content_list = []
+    for i in top10_value_list:
+        content = "User ID:" + str(i)
+        content_list.append(content)
+
+
+    x_axis = content_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m7():
+    queryset_distinct_values = models.CPA.objects.values_list('pid__brand').distinct()
+    value_list = []
+    count_list = []
+    for i in queryset_distinct_values:
+        value = i[0]
+        value_list.append(value)
+        count = models.CPA.objects.filter(pid__brand=value).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    value_array = np.array(value_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_value_list = value_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    x_axis = top10_value_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def bar_m8():
+    queryset_distinct_values = models.CPA.objects.values_list('pid').distinct()
+    value_list = []
+    count_list = []
+    for i in queryset_distinct_values:
+        value = i[0]
+        value_list.append(value)
+        count = models.CPA.objects.filter(pid=value).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    value_array = np.array(value_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_value_list = value_array[order_index][:10].tolist()
+    top10_count_list = count_array[order_index][:10].tolist()
+
+    x_axis_list = []
+
+    for idx in top10_value_list:
+        brand = models.Piano.objects.filter(pid=idx).first().brand
+        model = models.Piano.objects.filter(pid=idx).first().model
+        x_axis_list.append(brand+'-'+model)
+
+
+    x_axis = x_axis_list
+    legend = []
+
+    data_list = [
+        {
+            # 'name': year,
+            'type': 'bar',
+            'data': top10_count_list
+        }
+    ]
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+def pie_mul(brand):
+    queryset_distinct_values = models.CPA.objects.filter(pid__brand=brand).values_list('pid').distinct()
+    value_list = []
+    count_list = []
+    for i in queryset_distinct_values:
+        value = i[0]
+        value_list.append(value)
+        count = models.CPA.objects.filter(pid=value).count()
+        count_list.append(count)
+
+    count_array = np.array(count_list)
+    value_array = np.array(value_list)
+
+    order_index = (count_array * -1).argsort()
+
+    top10_value_list = value_array[order_index].tolist()
+    top10_count_list = count_array[order_index].tolist()
+
+    x_axis_list = []
+
+    for idx in top10_value_list:
+        model = models.Piano.objects.filter(pid=idx).first().model
+        x_axis_list.append(model)
+
+
+    x_axis = x_axis_list
+    data_list = []
+    for value,name in zip(top10_count_list,x_axis_list):
+        data_list.append({'value':value,'name':name})
+    # print(data_list)
+    legend = []
+
+    result = {
+        "status": True,
+        "data": {
+            'legend': legend,
+            'x_axis': x_axis,
+            'data_list': data_list
+        }
+    }
+    return result
+
+
+def chart_bar(request):
+    bar_m1_ele = bar_m1()
+    bar_m2_ele = bar_m2()
+    bar_m3_ele = bar_m3()
+    bar_m4_ele = bar_m4()
+    bar_m5_ele = bar_m5()
+    bar_m6_ele = bar_m6()
+    bar_m7_ele = bar_m7()
+    bar_m8_ele = bar_m8()
+    pie_m9_ele = pie_mul("Yamaha")
+    pie_m10_ele = pie_mul("Ritmuller")
+    pie_m11_ele = pie_mul("Pearl River")
+    pie_m12_ele = pie_mul("Kayserburg")
+
+    result = {}
+    result['bar_m1'] = bar_m1_ele
+    result['bar_m2'] = bar_m2_ele
+    result['bar_m3'] = bar_m3_ele
+    result['bar_m4'] = bar_m4_ele
+    result['bar_m5'] = bar_m5_ele
+    result['bar_m6'] = bar_m6_ele
+    result['bar_m7'] = bar_m7_ele
+    result['bar_m8'] = bar_m8_ele
+    result['pie_m9'] = pie_m9_ele
+    result['pie_m10'] = pie_m10_ele
+    result['pie_m11'] = pie_m11_ele
+    result['pie_m12'] = pie_m12_ele
+
+
+    return JsonResponse(result)
 
 # postcode_data_path = os.path.join("media", "shape_file", "vic_post.shp")
 # suburb_data_path = os.path.join("media", "shape_file", "vic_suburb.shp")

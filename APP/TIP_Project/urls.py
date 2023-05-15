@@ -76,6 +76,10 @@ urlpatterns = [
 
     path("dataviz/", dataviz_views.index),
 
+    # data visualisation - yongbin test
+    path("chart/list/", views.chart_list),
+    path("chart/bar/", views.chart_bar)
+
     path('admin/', admin.site.urls),
     path('', DashbordView, name='dashboard'),
     path('search/', SearchFilterView, name='search'),

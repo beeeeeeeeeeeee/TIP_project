@@ -157,3 +157,18 @@
 
 
 {% endblock %}
+{% block js %}
+    <script src="{% static "plugins/bootstrap-datepicker/js/bootstrap-datepicker.js" %}">
+    </script>
+    <script>
+        $(function () {
+            $('#id_sold_date').datepicker({
+                format: 'yyyy-mm-dd',
+                startDate: '2019-01-01',
+                autoclose: true
+            });
+
+        })
+    </script>
+
+{% endblock %}
