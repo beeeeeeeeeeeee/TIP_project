@@ -47,7 +47,7 @@
 
     #ui_overlay_right {
         position: absolute;
-        top: 1em;
+        top: 5em;
         right: 1em;
         width: 100%;
         max-width: 20rem;
@@ -60,8 +60,16 @@
         overflow-y: scroll;
         max-height: 90vh !important;
     }
+    #navbar {
+        position: fixed !important;
+        top:0;
+        z-index: 999 !important;
+        background-color: white !important;
+        width: 100vw !important;
+    }
 </style>
 <body>
+    {% include "navbar.html" %}
     <div>
         {% block content %}
         {% endblock %}

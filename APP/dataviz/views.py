@@ -6,4 +6,4 @@ from django.shortcuts import render
 #dummy view
 def index(request):
 
-    return render(request, 'index/index.html',{})
+    return render(request, 'index/index.html',{'nbar': 'map'})

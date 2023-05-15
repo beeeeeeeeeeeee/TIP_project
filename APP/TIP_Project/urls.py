@@ -29,7 +29,7 @@ urlpatterns = [
     
     path("admin/", admin.site.urls),
     
-    path("address/list/", views.address_list),
+    path("address/list/", views.address_list, name="data_management"),
     path("address/add/", views.address_add),
     path("address/<int:nid>/edit/", views.address_edit),
     path("address/multi/", views.address_multi),
@@ -74,7 +74,7 @@ urlpatterns = [
     path("select/<int:uid>/<int:aid>/<int:pid>/cpa/", views.select_cpa),
     path("select/<int:cid>/check/", views.select_check),
 
-    path("dataviz/", dataviz_views.index),
+    path("dataviz/", dataviz_views.index,name="map"),
 
     # data visualisation - yongbin test
     path("chart/list/", views.chart_list),
@@ -84,7 +84,7 @@ urlpatterns = [
     # path('', DashbordView, name='dashboard'),
     path('search/', SearchFilterView, name='search'),
     path('dashboard/', DashbordView, name='dashboard'),
-    path('map/',MapView, name='map'),
+    # path('map/',MapView, name='map'),
     path('api/models/', models_api, name='models_api'),
     path('export-csv/', export_csv, name='export_csv'),
 

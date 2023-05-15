@@ -183,7 +183,8 @@ def address_list(request):
         "form": form,
         "queryset": page_object.page_queryset,
         "page_string": page_object.html(),
-        "search_value": search_value
+        "search_value": search_value,
+        "nbar": "data_management",
 
     }
     return render(request, "address_list.html", content)
