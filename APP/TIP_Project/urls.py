@@ -78,10 +78,10 @@ urlpatterns = [
 
     # data visualisation - yongbin test
     path("chart/list/", views.chart_list),
-    path("chart/bar/", views.chart_bar)
+    path("chart/bar/", views.chart_bar),
 
-    path('admin/', admin.site.urls),
-    path('', DashbordView, name='dashboard'),
+    # path('admin/', admin.site.urls),
+    # path('', DashbordView, name='dashboard'),
     path('search/', SearchFilterView, name='search'),
     path('dashboard/', DashbordView, name='dashboard'),
     path('map/',MapView, name='map'),
