@@ -5,10 +5,11 @@ let results_center;
 let circle;
 let suburbCurrent;
 let placeIDs
+let exportButton;
 
 var selected_placeid = new Array();
 var distance_store = new Array();
-
+var markers = new Array();
 
 // load placeIDs.json
 // source https://gist.github.com/randomecho/5020859
@@ -16,8 +17,8 @@ fetch("/static/suburb_finder/js/placeIDs.json")
   .then((response) => response.json())
   .then((data) => {
     placeIDs = new Array(data)[0];
-    console.log("placeIDs_json ",placeIDs[3]);
-  });
+  }
+);
 
 var lat = -37.840935;
 var lng = 144.946457;
@@ -58,6 +59,9 @@ async function initMap() {
   autocomplete_origin.bindTo("bounds", map);
 
 
+  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+
   // Add the feature layer.
   //@ts-ignore
   featureLayer = map.getFeatureLayer("LOCALITY");
@@ -81,22 +85,37 @@ async function initMap() {
     suburbInput = document.getElementById("suburb");
     var suburb = suburbInput.value;
     console.log(suburb);
-    // Get the place details from suburb.
 
+    var suburb_arr = suburb.split(" ");
+    var postal_code = Number(suburb_arr[suburb_arr.length - 1]);
+    console.log("postal_code: ", postal_code);
+    
+    // Get the place details from suburb.
     var place_add = null;
     // Get the place detail from placeIDs.json
     if( placeIDs.some(item => item.name + ' ' + item.state === suburb )){
       place_add = placeIDs.filter(item => item.name + ' ' + item.state === suburb )[0];
-      selected_placeid.push(place_add);
-      console.log("selected_placeid ", selected_placeid);
 
+      if ( selected_placeid.some(item => item.placeID === place_add.placeID) ) {
+        // do nothing
+      } else {
+        selected_placeid.push(place_add);
+        console.log("selected_placeid ", selected_placeid);
+      }
       suburbCurrent = place_add;
     }
+    
+    if( placeIDs.some(item => item.postcode.includes(postal_code) )) {
+      place_add = placeIDs.filter(item => item.postcode.includes(postal_code) )[0];
+      selected_placeid.push(place_add);
+      console.log("selected_placeid ", selected_placeid);
+    }
 
-   
     applyStyleToMultipleSelected(selected_placeid);
     updateResultsTable(selected_placeid);
 
+    getElementById("suburb").value = "";
+    getElementById("origin").value = "";
 
   });
 
@@ -151,7 +170,10 @@ const clearButton = document.getElementById("clear_button");
 clearButton.addEventListener("click", () => {
   console.log("clear button clicked");
   clearAll();
-});
+  });
+
+  exportButton = document.getElementById("export_csv");
+  exportButton.addEventListener("click", export_csv);
 
 }
 
@@ -267,14 +289,41 @@ function updateRadiusValue(val) {
 
 // clear all selected places
 function clearAll() {
+
+  // clear selected places
   selected_placeid = Array();
   console.log(selected_placeid);
-  applyStyleToMultipleSelected(selected_placeid);
+
+  // clear suburb currently selected
   suburbCurrent = null;
+
+  // clear markers
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(null);
+  }
+
+  // clear existing radius circle
   if(typeof circle !== "undefined"){
     circle.setMap(null);  
   }
+  
+  // clear search inputs
+  var originInput = document.getElementById("origin");
+  originInput.value = "";
+
+  var suburbInput = document.getElementById("suburb");
+  suburbInput.value = "";
+
+  // reload suburb data removing distance and travel time data
+  fetch("/static/suburb_finder/js/placeIDs.json")
+  .then((response) => response.json())
+  .then((data) => {
+    placeIDs = new Array(data)[0];
+  });
+
+  applyStyleToMultipleSelected(selected_placeid);
   updateResultsTable(selected_placeid);
+
 }
 
 function updateResultsTable(selected_placeid) {
@@ -283,7 +332,9 @@ function updateResultsTable(selected_placeid) {
 
   var originInput = document.getElementById("origin");
   if (originInput.value) {   
-    calculateDistance(originInput.value, selected_placeid)
+    calculateDistance(originInput.value, selected_placeid);
+    addMarker(originInput.value);
+
   } else {
     buildResultsTable(selected_placeid);
   }
@@ -312,7 +363,7 @@ function buildResultsTable(selected_placeid) {
       const num_pc = place.postcode.length;
       if(num_pc > 1){
         min = Math.min(place.postcode.length, 4);
-        cell2.innerHTML = `${place.postcode.slice(0, min).join(", ")}...`;
+        cell2.innerHTML = `${place.postcode.slice(0, min).join(", ")}`;
       } else {
         cell2.innerHTML = place.postcode[0];
       }
@@ -376,9 +427,62 @@ function calculateDistance(origin, selected_placeid) {
   );
 }
 
+function addMarker(origin_address) {
+  
+  console.log("markers: ", markers);
+
+  // clear markers
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(null);
+  }
+
+  // geo code origin address
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: origin_address }, function (results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      var origin = results[0].geometry.location;
+      console.log("origin", origin);
+      marker = new google.maps.Marker({
+        position: origin,
+        map: map,
+        title: origin_address,
+      });
+      markers.push(marker);
+    } else {
+      alert("Geocode was not successful for the following reason: " + status);
+    }
+  });
+}
+
+  
+function export_csv() {
+  console.log("exporting to csv");
+  var csv = "Name, Postcode, Distance, Travel Time\n";
+  selected_placeid.forEach(function(row) {
+    csv += row.name + "," + row.postcode + "," + row.distance + "," + row.travelTime + "\n";
+  });
+  
+  console.log(csv);
+  
+  var hiddenElement = document.createElement('a');
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+  hiddenElement.target = '_blank';
+  hiddenElement.download = 'suburb_finder_results.csv';
+  hiddenElement.click();
+};
+
+// repostion map to include all markers
+function repositionMap() {
+  var bounds = new google.maps.LatLngBounds();
+  for (var i = 0; i < markers.length; i++) {
+    bounds.extend(markers[i].getPosition());
+  }
+  map.fitBounds(bounds);
+}
+
 // init onload functions
 function init() {
-
+  
 }
 
 window.onload = init;
