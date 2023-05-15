@@ -108,12 +108,11 @@ if env('ENVIRONMENT')=="docker":
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': env('MYSQL_DB'),
+            'NAME': env('MYSQL_DB_NAME'),
             'USER': env('MYSQL_USER'),
             'PASSWORD': env('MYSQL_PASSWORD'),
             'HOST': env('MYSQL_HOST'),
             'PORT': env('MYSQL_PORT'),
-            
         }
     }
 else:

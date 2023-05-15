@@ -1,68 +1,120 @@
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    
-    <meta charset="utf-8" />
-    <title>Suburb Finder</title>
+<!--{% extends "suburb_finder/base.html" %} -->
+{% block sidebar %}{% endblock %}
+{% block content %}
 
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+{% load static %}
+    <script src="{% static 'suburb_finder/js/index.js' %}"></script>
 
-    {% load static %}
-    <script type="module" src="{% static 'suburb_finder/js/index.js' %}"></script>
-    {% load static %}
-    <script type="module" src="{% static 'suburb_finder/js/address_add.js' %}"></script>
-    
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'suburb_finder/styles/style.css' %}"/>
+<!-- search address template -->
+    <br>
+    <br>
+    <br>
+    <main role="main" class="container-fluid">
+    <div class="container-fluid position-static">
+        <div class="form-row">
+            <div class="form-group col-md-5">
+                <h5 class="text p-0">Suburb Search</h5>
+            </div>
+            <div class="form-group col-md-5">
+                <h5 class="text p-0">Origin Address Search</h5>
+            </div>
+        </div>
+        
+           
+                
+            <div class="form-row">
+                <div class="form-group col-md-5">
+                    <div class="input-group">
+                        <input class="form-control py-2 border-right-0 border" type="searchaddress" id="suburb" name="#" placeholder="Search suburb here...">
+                        <span class="input-group-append">
+                            <div class="input-group-text bg-transparent">
+                                <i class="fa fa-search"></i>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            
+
+                    <div class="form-group col-md-5">
+                        <!-- number input for the distance -->
+                        <div class="input-group">
+                            <input class="form-control py-2 border-right-0 border" type="searchaddress" id="origin" name="#" placeholder="Search origin address...">
+                            <span class="input-group-append">
+                                <div class="input-group-text bg-transparent">
+                                    <i class="fa fa-search"></i>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+
+                <div class="form-group col-md-2">
+                    <button type="submit" id="search" class="btn btn-primary btn-block">Search</button>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <h5 class="text p-0">Radius (km):</h5>
+                </div>
+                <div class="form-group col-md-4">
+                    <!-- number input for the distance -->
+                    <div class="input-group">
+                        <input class="form-control py-2 border-right-0 border" type="range" id="radius" name="radius" min="1" max="150" value="50" oninput="updateRadiusValue(this.value)">
+                        <span class="input-group-append">
+                            
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <h5 class="text p-0" id="radius_value">5 km</h5>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <input type="button" id="clear_button" class="btn btn-primary btn-block" value="Clear"></input>
+                </div>
+
+        
+    </div>
+    <div class="row">
+        <div class="col-12 d-flex justify-content-center">
+            <div class="col" style="width: 90vw; height: 50vh;">
+                <!-- Add your map here -->
+                <div id="map" style="height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="container-fluid position-static">
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <input type="button" id="export_csv" class="btn btn-primary btn-block" value="Export to CSV"></input>
+            </div>
+        </div>
+    </div>
 
 
+    <div class="row">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Suburb</th>
+                    <th scope="col">Postcode</th>
+                    <th scope="col">Distance (km)</th>
+                    <th scope="col">Travel Time (mins)</th>
+                </tr>
+            </thead>
+            <tbody id="results_table">
+            </tbody>
+        </table>
+    </div>
 
-  </head>
-  <body>
-
-    <form action="{% url 'suburb_finder:index' %}" method="post">
-      {% csrf_token %}
-      <fieldset>
-          <legend><h1>Suburb Finder</h1></legend>
-          {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-          
-          <!-- origin address input -->
-          <label for="origin_ad">Origin address</label>
-          <input type="text" name="origin_ad" id="origin_ad" value="">
-          <br>
-          <br>
-          <!-- suburb search input -->
-          <label for="suburb">Suburb</label>
-          <input type="text" name="suburb" id="suburb" value="Enter a suburb">
-          <br>
-          <br>
-          <!-- slider input -->
-          <label for="myRange">Radius (km):</label>
-          <input type="range" name="radius" min="1" max="100" value="10" class="slider" id="myRange">
-          <br>
-
-          
-              
-
-      </fieldset>
-      <!-- <input type="submit" value="Search"> -->
-    </form>
-
-
-    <div id="map"></div>
-
-    <!-- 
-      The `defer` attribute causes the callback to execute after the full HTML
-      document has been parsed. For non-blocking uses, avoiding race conditions,
-      and consistent behavior across browsers, consider loading using Promises
-      with https://www.npmjs.com/package/@googlemaps/js-api-loader.
-      -->
 
     <script
       src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap&v=beta&region=AU&libraries=places"
       async defer>
     </script>
 
+    </main>
 
-  </body>
-</html>
+{% endblock %}

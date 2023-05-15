@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from app01 import views
+from suburb_finder.views import DashbordView
 from dataviz import views as dataviz_views
 
 from search.views import SearchFilterView, models_api, export_csv, MapView, DashbordView

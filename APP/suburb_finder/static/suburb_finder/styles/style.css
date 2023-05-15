@@ -3,7 +3,7 @@
  * that contains the map. 
  */
  #map {
-  height: 80%;
+  height: 50%;
 }
 
 
@@ -112,5 +112,11 @@ h3 {
   background-color: royalblue;
 }
 
-
+.results_table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  border-width: 2px;
+  width: 100%;
+  margin: 0.6em;
+}
 
