@@ -20,6 +20,7 @@ def index(request):
     context = {
         'suburb_list': suburb_list,
         'api_key': settings.GOOGLE_API_KEY,
+        'nbar' : 'suburb_finder',
     }
     
     google_api = env("GOOGLE_API_KEY")
@@ -53,7 +54,8 @@ def DashbordView(request):
     context = {
         'api_key': settings.GOOGLE_API_KEY,
         'nbar': 'dashboard',
-        'map_dashboard': m
+        'map_dashboard': m,
+        'nbar' : 'dashboard',
     }
     template = 'suburb_finder/dashboard.html'
 

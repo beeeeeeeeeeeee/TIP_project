@@ -21,13 +21,15 @@ from django.urls import path, include
 from app01 import views
 from suburb_finder.views import DashbordView
 from dataviz import views as dataviz_views
+from suburb_finder import views as suburb_finder_views
 
 from search.views import SearchFilterView, models_api, export_csv, MapView, DashbordView
 
 urlpatterns = [
 
-    path("suburb_finder/", include("suburb_finder.urls")),
-    
+    path("suburb_finder/", suburb_finder_views.index, name = 'suburb_finder'),
+    path("", suburb_finder_views.index, name = 'suburb_finder'),
+
     path("admin/", admin.site.urls),
     
     path("address/list/", views.address_list, name="data_management"),

@@ -17,12 +17,12 @@ services:
       - web-migrate
     restart: "unless-stopped"
     environment:
+      - WAIT_HOSTS=mysql:3306
+      - MYSQL_HOST=mysql
       - ENVIRONMENT=docker
-
-      - MYSQL_DB_NAME=${MYSQL_DB_NAME}
-      - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_DB=${MYSQL_DB}
       - MYSQL_PORT=${MYSQL_PORT}
   
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
@@ -56,9 +56,6 @@ services:
       - MYSQL_PORT=${MYSQL_PORT}
   
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      
-      - DJANGO_SECRET_KEY=secretkey
-
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
 
       # FOR S3 BUCKET
