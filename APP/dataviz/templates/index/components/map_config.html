@@ -1,0 +1,53 @@
+<form id="map_config">
+    <div class="mb-3">
+        <label class="form-label">Starting Geo Spatial Coordinate</label>
+        <div class="input-group">
+            <span class="input-group-text">lat</span>
+            <input id="config_lat" name="config_lat" type="number"  step=any class="form-control" aria-label="latitude">
+            <span class="input-group-text">long</span>
+            <input id="config_long" name="config_long" type="number" step=any class="form-control" aria-label="longtitude">
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="customRange2" class="form-label">Overlay Opacity</label>
+        
+        <input type="range" id="config_opacity" name="config_opacity" class="form-range" min="0" max="1" step="0.01" id="customRange2">
+
+        
+    </div>
+
+    <div class="mb-3">
+        <label for="map_scale" class="form-label">Hex Scale (km) (some are disabled)</label>
+        
+        <br>
+        <div id="map_scale" class="btn-group" role="group"
+            aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio0"
+                autocomplete="off" value="0.5" disabled>
+            <label class="btn btn-outline-primary" for="btnradio0">0.5</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio1"
+                autocomplete="off" checked value="1" >
+            <label class="btn btn-outline-primary" for="btnradio1">1</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio2"
+                autocomplete="off"   value="2">
+            <label class="btn btn-outline-primary" for="btnradio2">2</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio3"
+                autocomplete="off" value="3" >
+            <label class="btn btn-outline-primary" for="btnradio3">3</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio4"
+                autocomplete="off" value="5">
+            <label class="btn btn-outline-primary" for="btnradio4">5</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio5"
+                autocomplete="off" value="10">
+            <label class="btn btn-outline-primary" for="btnradio5">10</label>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Apply</button>
+    <button type="reset" class="btn btn-secondary">Reset</button>
+</form>

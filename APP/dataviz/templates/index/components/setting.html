@@ -9,18 +9,19 @@
             </h2>
             <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample2">
                 <div class="accordion-body">
-                    <form>
+                    <!-- <form>
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Search</label>
                             <input type="email" class="form-control" id="exampleInputEmail1"
                                 aria-describedby="emailHelp">
                         </div>
                         <button type="button" class="btn btn-primary">Submit</button>
-                    </form>
+                    </form> -->
+                    {% include "index/components/map_config.html" %}
                 </div>
-                <div class="accordion-body" style="max-height:50vh ;overflow-y: scroll;">
+                <!-- <div class="accordion-body" style="max-height:50vh ;overflow-y: scroll;">
                     {% include "index/components/datatable.html"  with data="1234567890"%}
-                </div>
+                </div> -->
             </div>
         </div>
         <div class="accordion-item">
@@ -34,7 +35,7 @@
                 <div class="accordion-body">
                     
                     <br>
-                    <div class="form-check form-switch">
+                    <!-- <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" checked>
                         <label class="form-check-label" for="flexSwitchCheckDefault">enable overlay</label>
                       </div>
@@ -51,7 +52,7 @@
                       <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled" checked disabled>
                         <label class="form-check-label" for="flexSwitchCheckCheckedDisabled">Disabled checked switch checkbox input</label>
-                      </div>
+                      </div> -->
                       <a class="btn btn-primary" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
                         Advanced
                     </a>
