@@ -50,6 +50,7 @@ data_column = {
 access_key = settings.ACCESS_KEY
 access_secret = settings.ACCESS_SECRET
 bucket_name = settings.BUCKET_NAME
+bucket_function_open = False
 
 
 def data_excel_file():
@@ -146,6 +147,14 @@ def upload_s3():
     )
 
 
+def s3_upload(function_open):
+    if function_open:
+        data_excel_file()
+        upload_s3()
+    else:
+        pass
+
+
 class AddressModelForm(forms.ModelForm):
     class Meta:
         model = models.Address
@@ -214,9 +223,8 @@ def address_add(request):
         # print(address, suburb, postcode, lat, long)
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/address/list/")
     return render(request, "address_add.html", {"form": form, "title": title})
 
@@ -239,9 +247,8 @@ def address_multi(request):
                                       lat=latitude, long=longitude)
 
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return redirect("/address/list/")
 
 
@@ -257,9 +264,8 @@ def address_edit(request, nid):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/address/list/")
     else:
         return render(request, "address_add.html", {"form": form, "title": title})
@@ -273,9 +279,8 @@ def address_delete(request):
         return JsonResponse({"status": False, "error": "Data not exist!"})
     models.Address.objects.filter(aid=uid).delete()
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return JsonResponse({"status": True})
 
 
@@ -329,9 +334,8 @@ def user_add(request):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/user/list/")
     return render(request, "add.html", {"form": form, "title": title})
 
@@ -354,9 +358,8 @@ def user_multi(request):
                                    gender=gender, phone_number=phone_number)
         # print(pid, brand, model, sub_model, colour, piano_type)
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return redirect("/user/list/")
 
 
@@ -372,9 +375,8 @@ def user_edit(request, nid):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/user/list/")
     else:
         return render(request, "add.html", {"form": form, "title": title})
@@ -388,9 +390,8 @@ def user_delete(request):
         return JsonResponse({"status": False, "error": "Data not exist!"})
     models.User.objects.filter(uid=uid).delete()
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return JsonResponse({"status": True})
 
 
@@ -453,9 +454,8 @@ def piano_multi(request):
                                     colour=colour, type=piano_type)
         # print(pid, brand, model, sub_model, colour, piano_type)
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return redirect("/piano/list/")
 
 
@@ -469,9 +469,8 @@ def piano_add(request):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/piano/list/")
     return render(request, "add.html", {"form": form, "title": title})
 
@@ -488,9 +487,8 @@ def piano_edit(request, nid):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/piano/list/")
     else:
         return render(request, "add.html", {"form": form, "title": title})
@@ -504,9 +502,8 @@ def piano_delete(request):
         return JsonResponse({"status": False, "error": "Data not exist!"})
     models.Piano.objects.filter(pid=uid).delete()
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return JsonResponse({"status": True})
 
 
@@ -578,9 +575,8 @@ def cpa_multi(request):
                                   sold_date=sold_date, active=active, directly_sold=directly_sold)
         # print(cid, uid, aid, pid, sn, sales, co_sales, sold_date, active, directly_sold)
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return redirect("/cpa/list/")
 
 
@@ -594,9 +590,8 @@ def cpa_add(request):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/cpa/list/")
     return render(request, "add_cpa.html", {"form": form, "title": title})
 
@@ -613,9 +608,8 @@ def cpa_edit(request, nid):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/cpa/list/")
     else:
         return render(request, "add.html", {"form": form, "title": title})
@@ -629,9 +623,8 @@ def cpa_delete(request):
         return JsonResponse({"status": False, "error": "Data not exist!"})
     models.CPA.objects.filter(cid=uid).delete()
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return JsonResponse({"status": True})
 
 
@@ -702,9 +695,8 @@ def tuning_multi(request):
 
         # print(cid, uid, aid, pid, sn, sales, co_sales, sold_date, active, directly_sold)
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return redirect("/tuning/list/")
 
 
@@ -718,9 +710,8 @@ def tuning_add(request):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/tuning/list/")
     return render(request, "add_tuning.html", {"form": form, "title": title})
 
@@ -737,9 +728,8 @@ def tuning_edit(request, nid):
     if form.is_valid():
         form.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/tuning/list/")
     else:
         return render(request, "add.html", {"form": form, "title": title})
@@ -753,9 +743,8 @@ def tuning_delete(request):
         return JsonResponse({"status": False, "error": "Data not exist!"})
     models.Tuning.objects.filter(tid=uid).delete()
     # rewrite/create the file test.xls in media folder
-    data_excel_file()
     # upload the test.xls file to aws s3 bucket
-    upload_s3()
+    s3_upload(bucket_function_open)
     return JsonResponse({"status": True})
 
 
@@ -1067,9 +1056,8 @@ def tuning_book(request, nid):
                                    piano_condition=piano_condition)
         new_tuning.save()
         # rewrite/create the file test.xls in media folder
-        data_excel_file()
         # upload the test.xls file to aws s3 bucket
-        upload_s3()
+        s3_upload(bucket_function_open)
         return redirect("/tuning/%s/book/" % nid)
     else:
         context["form"] = form
@@ -1322,10 +1310,8 @@ def cpa_new(request):
                 update_status += 1
         if update_status > 0:
             # rewrite/create the file test.xls in media folder
-            data_excel_file()
             # upload the test.xls file to aws s3 bucket
-            upload_s3()
-
+            s3_upload(bucket_function_open)
         return redirect(f"/tuning/{cid}/book/")
 
     return render(request, "cpa_new.html", {"form": form, "title": title})
@@ -1371,9 +1357,8 @@ def select_user(request):
                 form_add.save()
                 uid = models.User.objects.filter(phone_number=request.POST.get("phone_number")).first().uid
                 # rewrite/create the file test.xls in media folder
-                data_excel_file()
                 # upload the test.xls file to aws s3 bucket
-                upload_s3()
+                s3_upload(bucket_function_open)
                 return redirect(f"/select/{uid}/address/")
             else:
 
@@ -1431,9 +1416,8 @@ def select_address(request, nid):
                 form_add.save()
                 aid = models.Address.objects.filter(result_query).first().aid
                 # rewrite/create the file test.xls in media folder
-                data_excel_file()
                 # upload the test.xls file to aws s3 bucket
-                upload_s3()
+                s3_upload(bucket_function_open)
                 # print(aid)
 
             return redirect(f"/select/{uid}/{aid}/piano/")
@@ -1525,9 +1509,9 @@ def select_piano(request, uid, aid):
                     type=request.POST.get("type", ""),
                 ).first().pid
                 # rewrite/create the file test.xls in media folder
-                data_excel_file()
+
                 # upload the test.xls file to aws s3 bucket
-                upload_s3()
+                s3_upload(bucket_function_open)
                 return redirect(f"/select/{uid}/{aid}/piano/")
             else:
                 return render(request, "select_piano.html", context)
@@ -1645,9 +1629,8 @@ def select_cpa(request, uid, aid, pid):
                                             directly_sold=directly_sold).cid
 
             # rewrite/create the file test.xls in media folder
-            data_excel_file()
             # upload the test.xls file to aws s3 bucket
-            upload_s3()
+            s3_upload(bucket_function_open)
             return redirect(f"/select/{cid}/check/")
         else:
             return render(request, "select_cpa.html", context)
@@ -1691,13 +1674,13 @@ def bar_m1():
         year = i.year
         year_list.append(str(i.year))
         year_data = []
-        for month in range(1,13):
-            queryset = models.CPA.objects.filter(sold_date__year=year,sold_date__month=month)
+        for month in range(1, 13):
+            queryset = models.CPA.objects.filter(sold_date__year=year, sold_date__month=month)
             count = queryset.count()
             year_data.append(count)
         year_data_list.append(year_data)
     data_list = []
-    for idx,year in enumerate(year_list):
+    for idx, year in enumerate(year_list):
         element = {
             'name': year,
             'type': 'bar',
@@ -1706,7 +1689,7 @@ def bar_m1():
         data_list.append(element)
     legend = year_list
     month_list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug","Sep","Oct","Nov","Dec"]
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     result = {
         "status": True,
         "data": {
@@ -1716,6 +1699,7 @@ def bar_m1():
         }
     }
     return result
+
 
 def bar_m2():
     year_query = models.CPA.objects.dates('sold_date', 'year')
@@ -1745,12 +1729,13 @@ def bar_m2():
     }
     return result
 
+
 def bar_m3():
     month_list = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug","Sep","Oct","Nov","Dec"]
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     legend = []
     month_data_list = []
-    for i in range(1,13):
+    for i in range(1, 13):
         count = models.CPA.objects.filter(sold_date__month=i).count()
         month_data_list.append(count)
 
@@ -1771,6 +1756,7 @@ def bar_m3():
         }
     }
     return result
+
 
 def bar_m4():
     queryset_distinct_suburb = models.CPA.objects.values_list('aid__suburb').distinct()
@@ -1811,6 +1797,7 @@ def bar_m4():
     }
     return result
 
+
 def bar_m5():
     queryset_distinct_suburb = models.CPA.objects.values_list('aid__postcode').distinct()
     suburb_list = []
@@ -1850,6 +1837,7 @@ def bar_m5():
     }
     return result
 
+
 def bar_m6():
     queryset_distinct_value = models.CPA.objects.values_list('uid').distinct()
     value_list = []
@@ -1873,7 +1861,6 @@ def bar_m6():
         content = "User ID:" + str(i)
         content_list.append(content)
 
-
     x_axis = content_list
     legend = []
 
@@ -1894,6 +1881,7 @@ def bar_m6():
         }
     }
     return result
+
 
 def bar_m7():
     queryset_distinct_values = models.CPA.objects.values_list('pid__brand').distinct()
@@ -1934,6 +1922,7 @@ def bar_m7():
     }
     return result
 
+
 def bar_m8():
     queryset_distinct_values = models.CPA.objects.values_list('pid').distinct()
     value_list = []
@@ -1957,8 +1946,7 @@ def bar_m8():
     for idx in top10_value_list:
         brand = models.Piano.objects.filter(pid=idx).first().brand
         model = models.Piano.objects.filter(pid=idx).first().model
-        x_axis_list.append(brand+'-'+model)
-
+        x_axis_list.append(brand + '-' + model)
 
     x_axis = x_axis_list
     legend = []
@@ -1980,6 +1968,7 @@ def bar_m8():
         }
     }
     return result
+
 
 def pie_mul(brand):
     queryset_distinct_values = models.CPA.objects.filter(pid__brand=brand).values_list('pid').distinct()
@@ -2005,11 +1994,10 @@ def pie_mul(brand):
         model = models.Piano.objects.filter(pid=idx).first().model
         x_axis_list.append(model)
 
-
     x_axis = x_axis_list
     data_list = []
-    for value,name in zip(top10_count_list,x_axis_list):
-        data_list.append({'value':value,'name':name})
+    for value, name in zip(top10_count_list, x_axis_list):
+        data_list.append({'value': value, 'name': name})
     # print(data_list)
     legend = []
 
@@ -2051,7 +2039,6 @@ def chart_bar(request):
     result['pie_m10'] = pie_m10_ele
     result['pie_m11'] = pie_m11_ele
     result['pie_m12'] = pie_m12_ele
-
 
     return JsonResponse(result)
 
