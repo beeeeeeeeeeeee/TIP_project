@@ -2,7 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,django,jupyternotebooks,visualstudiocode
 
 todo.txt
-
+*.xlsx
 ### Django ###
 *.log
 *.pot
